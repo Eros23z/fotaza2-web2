@@ -1,0 +1,58 @@
+extends layout
+
+block content
+  .profile-container
+    if userProfile
+      header.profile-header
+        .profile-info
+          h1 @#{userProfile.username}
+          p.full-name #{userProfile.nombre} #{userProfile.apellido}
+          p.email Correo: #{userProfile.email}
+          if userProfile.fecha_registro
+            p.joined Miembro desde: #{new Date(userProfile.fecha_registro).toLocaleDateString()}
+        
+        .profile-stats
+          .stat-item
+            span.stat-number #{followersCount || 0}
+            span.stat-label Seguidores
+          .stat-item
+            span.stat-number #{followingCount || 0}
+            span.stat-label Siguiendo
+          .stat-item
+            span.stat-number #{userPosts ? userPosts.length : 0}
+            span.stat-label Publicaciones
+
+        .profile-actions
+          if isOwnProfile
+            span.badge-own (Este es tu perfil de usuario)
+          else
+            if isFollowing
+              form(action=`/users/${userProfile.id_usuario}/unfollow` method="POST")
+                button(type="submit" class="btn-unfollow") Dejar de seguir
+            else
+              form(action=`/users/${userProfile.id_usuario}/follow` method="POST")
+                button(type="submit" class="btn-follow") Seguir al usuario
+
+      hr
+
+      section.profile-posts
+        h2 Publicaciones de @#{userProfile.username}
+        if userPosts && userPosts.length > 0
+          .posts-grid
+            each post in userPosts
+              article.post-thumb-card
+                if post.imagen_url
+                  .thumb-image
+                    img(src=post.imagen_url, alt=post.titulo)
+                .thumb-body
+                  h3= post.titulo
+                  p= post.descripcion ? post.descripcion.substring(0, 100) + '...' : ''
+                  a(href=`/posts-detail/${post.id_publicacion}` class="btn-view-more") Ver detalles
+        else
+          p.no-posts-msg Este usuario no tiene publicaciones creadas aún.
+
+    else
+      .no-profile
+        h1 Usuario no encontrado
+        p El perfil que intentas visualizar no existe.
+        a(href="/") Volver al inicio

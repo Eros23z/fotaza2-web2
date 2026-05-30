@@ -9,7 +9,8 @@ block content
         article.post-card
           .post-header
             h2= post.titulo
-            span.username Por: #{post.username}
+            a(href=`/profile/${post.id_usuario}`)
+              span.username Por: #{post.username}
           
           .post-image
             img(src=post.imagen_url, alt=post.titulo)

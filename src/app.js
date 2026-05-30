@@ -4,8 +4,10 @@ require('dotenv').config();
 const cookieParser = require('cookie-parser');
 const { protect } = require('./middlewares/authMiddleware');
 const { Post } = require('./models/postModel');
+const User = require('./models/userModel');
 const authController = require('./controllers/authController');
 const postController = require('./controllers/postController');
+const userController = require('./controllers/userController');
 
 const app = express();
 const port = process.env.PORT;
@@ -49,9 +51,47 @@ app.get('/create-post', protect, (req, res) => {
 });
 
 app.get('/posts-detail/:id_publicacion', protect, postController.getPostDetail);
-
 app.post('/posts-detail/:id_publicacion/comments', protect, postController.addComments);
 app.post('/posts-detail/:id_publicacion/rate', protect, postController.addRating);
+
+app.get('/following', protect, async (req, res) => {
+    try {
+        const id_usuario = req.user.id;
+        const posts = await Post.getPostsFromFollowing(id_usuario);
+        res.render('index', { title: 'Publicaciones de los que sigo', user: req.user, posts: posts });
+    } catch (error) {
+        res.status(500).send('Error al cargar las publicaciones de los que sigo');
+    }
+});
+
+app.post('/users/:id_usuario/unfollow', protect, userController.unfollowUser);
+app.post('/users/:id_usuario/follow', protect, userController.followUser);
+app.get('/profile/:id_usuario', protect, async (req, res) => {
+    try {
+        const id_usuario = req.params.id_usuario;
+        const userProfile = await User.getProfile(id_usuario);
+        const currentUser = req.user.id;
+        const isOwnProfile = currentUser === userProfile.id_usuario;
+        const isFollowing = isOwnProfile ? false : await User.isFollowing(currentUser, userProfile.id_usuario);
+        const followersCount = await User.countFollowers(id_usuario);
+        const followingCount = await User.countFollowing(id_usuario);
+        const userPosts = await Post.getPostsByUser(id_usuario);
+
+        res.render('profile', {
+            title: `Perfil de ${userProfile.username}`,
+            userProfile: userProfile,
+            currentUser: currentUser,
+            isOwnProfile: isOwnProfile,
+            isFollowing: isFollowing,
+            followersCount: followersCount,
+            followingCount: followingCount,
+            userPosts: userPosts
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al cargar el perfil');
+    }
+});
 
 app.get('/register', (req, res) => {
     if (req.user) return res.redirect('/');

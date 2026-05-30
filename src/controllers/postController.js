@@ -134,3 +134,14 @@ exports.addRating = async (req, res) => {
         res.status(500).send('Error al agregar la valoración');
     }
 }
+
+exports.getPostByUser = async (req, res) => {
+    try {
+        const { id_usuario } = req.params.id_usuario;
+        const userPosts = await Post.getPostsByUser(id_usuario);
+        res.render('profile', { title: 'Perfil', userPosts: userPosts });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al obtener las publicaciones');
+    }
+}
