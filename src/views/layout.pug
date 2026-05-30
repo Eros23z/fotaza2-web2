@@ -1,0 +1,33 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title= title || "Fotaza 2"
+    link(rel="stylesheet", href="/css/style.css")
+  body
+    header
+      nav
+        div.nav-links
+          a(href="/") Inicio
+          if user
+            a(href="/create-post") Nueva Publicación
+            a(href="/logout") Salir
+          else
+            a(href="/login") Entrar
+            a(href="/register") Registrarse
+        
+        div.nav-search
+          form(action="/search" method="GET")
+            input(type="text" name="q" placeholder="Buscar fotos o tags..." value=searchTerm)
+            button(type="submit") Buscar
+
+      if user
+        div.user-info
+          span Conectado como: #{user.username}
+    
+    main
+      block content 
+
+    footer
+      p &copy; 2026 Fotaza 2 - Programación Web II

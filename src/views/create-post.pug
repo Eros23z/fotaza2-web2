@@ -1,0 +1,30 @@
+extends layout
+
+block content
+    h1 Nueva Publicación
+
+    form(action="/create-post", method="POST", enctype="multipart/form-data")
+      
+      div.form-group
+        label(for="titulo") Título:
+        input(type="text", name="titulo", id="titulo", required)
+      div.form-group
+        label(for="descripcion") Descripción:
+        input(type="text", name="descripcion", id="descripcion")
+      div.form-group
+        label(for="imagen") Seleccionar Imagen:
+        input(type="file", name="imagen", id="imagen", accept="image/png,image/jpeg,image/webp", required)
+      div.form-group.checkbox-group
+        input(type="checkbox", name="tiene_copyright", id="tiene_copyright", value="1")
+        label(for="tiene_copyright") Esta imagen tiene copyright
+      
+      div.form-group.checkbox-group
+        input(type="checkbox", name="comentarios_cerrados", id="comentarios_cerrados", value="1")
+        label(for="comentarios_cerrados") Cerrar comentarios para esta publicación
+
+      div
+        label(for="nombre_tag") Tags (separados por coma)
+        input(type="text", name="nombre_tag", id="nombre_tag", placeholder="ej: paisajes, vacaciones, nocturna")
+
+      div
+        button(type="submit") Publicar

@@ -1,0 +1,56 @@
+extends layout
+
+block content
+  h1 #{title}
+
+  .feed-container
+    if post
+        article.post-card
+          .post-header
+            h1= post.titulo
+            span.username Por: #{post.username}
+          
+          .post-image
+            img(src=post.imagen_url, alt=post.titulo)
+          
+          .post-rating
+            h3 Valoración de la Imagen
+            if post.valoracion && post.valoracion.promedio
+              p Promedio: #{Number(post.valoracion.promedio).toFixed(1)} / 5 (Votos: #{post.valoracion.total_votos})
+            else
+              p Promedio: Sin valoraciones aún
+            
+            if isAuthor
+              p.rating-message No puedes valorar tu propia publicación.
+            else if userHasRated
+              p.rating-message ¡Ya has valorado esta imagen! Gracias.
+            else
+              form(action=`/posts-detail/${post.id_publicacion}/rate` method="POST" class="rating-form")
+                label(for="puntaje") Tu valoración: 
+                select(name="puntaje" id="puntaje")
+                  option(value="5") 5 - Excelente
+                  option(value="4") 4 - Muy buena
+                  option(value="3") 3 - Buena
+                  option(value="2") 2 - Regular
+                  option(value="1") 1 - Mala
+                button(type="submit" class="btn-rate") Enviar valoración
+          
+          .post-body
+            p= post.descripcion
+          
+          .post-footer
+            if !post.comentarios_cerrados
+              form(action=`/posts-detail/${post.id_publicacion}/comments` method="POST")
+                textarea(name="texto_comentario", id="texto_comentario" placeholder="Escribe un comentario...")
+                button(type="submit") Comentar
+            else
+              p.comments-closed Los comentarios están cerrados para esta publicación.
+            each comment in post.comentarios
+              .comment
+                p= comment.texto_comentario
+                span.username Por: #{comment.username_comentario}
+    else
+      .no-posts
+        p No se encontro la publicacion
+        if searchTerm
+          a(href="/") Ver todas las publicaciones

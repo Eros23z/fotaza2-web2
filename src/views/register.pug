@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  h1 Crea tu cuenta en Fotaza 2
+  
+  form(action="/register", method="POST")
+      
+      div
+        label(for="nombre") Nombre:
+        input(type="text", name="nombre", id="nombre", required)
+
+      div
+        label(for="apellido") Apellido:
+        input(type="text", name="apellido", id="apellido", required)
+      div
+        label(for="username") Nombre de usuario:
+        input(type="text", name="username", id="username", required)
+      div
+        label(for="email") Email:
+        input(type="email", name="email", id="email", required)
+      div
+        label(for="password") Contraseña:
+        input(type="password", name="password", id="password", required)
+      div
+        label(for="fecha_nacimiento") Fecha de nacimiento:
+        input(type="date", name="fecha_nacimiento", id="fecha_nacimiento", required)
+
+      div
+        button(type="submit") Registrarme
+
+  p ¿Ya tienes cuenta? 
+    a(href="/login") Inicia sesión aquí

@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  h1 #{title}
+
+  .feed-container
+    if posts && posts.length > 0
+      each post in posts
+        article.post-card
+          .post-header
+            h2= post.titulo
+            span.username Por: #{post.username}
+          
+          .post-image
+            img(src=post.imagen_url, alt=post.titulo)
+          
+          .post-body
+            p= post.descripcion
+          
+          .post-footer
+            a.btn-detail(href=`/posts-detail/${post.id_publicacion}`) Ver detalles
+    else
+      .no-posts
+        p No se encontraron publicaciones.
+        if searchTerm
+          a(href="/") Ver todas las publicaciones
