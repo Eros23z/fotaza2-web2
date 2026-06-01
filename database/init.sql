@@ -41,6 +41,7 @@ CREATE TABLE publicaciones (
     descripcion TEXT,
     fecha_publicacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     comentarios_cerrados BOOLEAN DEFAULT FALSE,
+    filtrada BOOLEAN DEFAULT FALSE,
     CONSTRAINT fk_usuario_pub FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
@@ -72,6 +73,7 @@ CREATE TABLE comentarios (
     id_publicacion INT NOT NULL,
     texto_comentario TEXT NOT NULL,
     fecha_comentario TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    filtrado BOOLEAN DEFAULT FALSE,
     CONSTRAINT fk_usuario_com FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
     CONSTRAINT fk_publicacion_com FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE
 );

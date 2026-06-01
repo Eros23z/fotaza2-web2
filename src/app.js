@@ -8,6 +8,8 @@ const User = require('./models/userModel');
 const authController = require('./controllers/authController');
 const postController = require('./controllers/postController');
 const userController = require('./controllers/userController');
+const isValidador = require('./middlewares/validador');
+const reportController = require('./controllers/reportController');
 
 const app = express();
 const port = process.env.PORT;
@@ -93,6 +95,11 @@ app.get('/profile/:id_usuario', protect, async (req, res) => {
     }
 });
 
+app.post('/posts-detail/:id_publicacion/report', protect, reportController.reportPost);
+app.get('/admin/reports', protect, isValidador, reportController.getPendingReports);
+app.post('/admin/reports/:id_denuncia/dismiss', protect, isValidador, reportController.dismissReport);
+app.post('/admin/reports/:id_denuncia/takedown', protect, isValidador, reportController.takeDownReport);
+
 app.get('/register', (req, res) => {
     if (req.user) return res.redirect('/');
     res.render('register', { title: 'Registro' });
@@ -104,6 +111,7 @@ app.get('/login', (req, res) => {
 });
 
 const upload = require('./middlewares/upload');
+const { report } = require('process');
 app.post('/create-post', protect, upload.array('imagen', 5), postController.createPost);
 app.post('/register', authController.postRegister);
 app.post('/login', authController.postLogin);

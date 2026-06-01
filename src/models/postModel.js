@@ -7,6 +7,7 @@ const Post = {
             FROM publicaciones p
             LEFT JOIN imagenes i ON p.id_publicacion = i.id_publicacion
             JOIN usuarios u ON p.id_usuario = u.id_usuario
+            WHERE p.filtrada = false
             ORDER BY p.fecha_publicacion DESC;
         `;
         const { rows } = await db.query(query);
@@ -51,7 +52,7 @@ const Post = {
             FROM publicaciones p
             LEFT JOIN imagenes i ON p.id_publicacion = i.id_publicacion
             JOIN usuarios u ON p.id_usuario = u.id_usuario
-            WHERE p.id_publicacion = $1;
+            WHERE p.id_publicacion = $1 AND p.filtrada = false;
         `;
         const postResult = await db.query(postQuery, [id_publicacion]);
         const post = postResult.rows[0];
@@ -61,7 +62,7 @@ const Post = {
             SELECT c.*, u.username as username_comentario
             FROM comentarios c
             JOIN usuarios u ON c.id_usuario = u.id_usuario
-            WHERE c.id_publicacion = $1
+            WHERE c.id_publicacion = $1 AND c.filtrado = false
             ORDER BY c.fecha_comentario DESC;
         `;
         const commentsResult = await db.query(commentsQuery, [id_publicacion]);
@@ -126,6 +127,12 @@ const Post = {
         `;
         const { rows } = await db.query(query, [id_usuario]);
         return rows;
+    },
+
+    getCommentAuthor: async (id_comentario) => {
+        const query = `SELECT id_usuario FROM comentarios WHERE id_comentario = $1`;
+        const { rows } = await db.query(query, [id_comentario]);
+        return rows[0];
     }
 };
 

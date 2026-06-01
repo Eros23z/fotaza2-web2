@@ -12,6 +12,8 @@ html(lang="es")
           a(href="/") Inicio
           if user
             a(href="/create-post") Nueva Publicación
+            if user.rol === 'validador'
+              a(href="/admin/reports") Moderación
             a(href="/logout") Salir
           else
             a(href="/login") Entrar

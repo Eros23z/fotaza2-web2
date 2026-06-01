@@ -425,3 +425,73 @@ footer {
 .btn-view-more:hover {
     background-color: #2980b9;
 }
+
+/* Estilos para el formulario de denuncias */
+.report-section {
+    margin-top: 20px;
+    border-top: 1px dashed #ccc;
+    padding-top: 15px;
+}
+
+.report-summary {
+    font-weight: bold;
+    font-size: 0.95em;
+    color: #c0392b;
+    cursor: pointer;
+    user-select: none;
+}
+
+.report-summary:hover {
+    text-decoration: underline;
+}
+
+.report-form {
+    background-color: #fdf2f2;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.report-form div {
+    margin-bottom: 10px;
+}
+
+.report-form label {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #721c24;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.report-form select,
+.report-form textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.report-form textarea {
+    height: 80px;
+    resize: vertical;
+}
+
+.btn-report {
+    background-color: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9em;
+    width: auto;
+}
+
+.btn-report:hover {
+    background-color: #a93226;
+}

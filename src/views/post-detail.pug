@@ -38,6 +38,24 @@ block content
           
           .post-body
             p= post.descripcion
+            
+            .report-section
+              details.report-details
+                summary.report-summary Denunciar esta publicación
+                form(action=`/posts-detail/${post.id_publicacion}/report` method="POST" class="report-form")
+                  input(type="hidden" name="id_publicacion" value=post.id_publicacion)
+                  div
+                    label(for="motivo") Motivo de la denuncia:
+                    select(name="motivo" id="motivo" required)
+                      option(value="") -- Selecciona un motivo --
+                      option(value="Spam") Spam
+                      option(value="Contenido inapropiado") Contenido inapropiado
+                      option(value="Copyright") Derechos de autor / Copyright
+                      option(value="Otro") Otro
+                  div
+                    label(for="descripcion_denuncia") Detalles:
+                    textarea(name="descripcion" id="descripcion_denuncia" placeholder="Explica detalladamente por qué denuncias esta publicación..." required)
+                  button(type="submit" class="btn-report") Enviar Denuncia
           
           .post-footer
             if !post.comentarios_cerrados

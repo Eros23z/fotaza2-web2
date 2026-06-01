@@ -68,8 +68,8 @@ const User = {
         `;
         const { rows } = await db.query(query, [id_seguidor, id_seguido]);
         return parseInt(rows[0].count, 10) > 0;
-    }
-    
+    },
+
 };  
 
 module.exports = User;
