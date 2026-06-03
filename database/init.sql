@@ -50,7 +50,7 @@ CREATE TABLE imagenes (
     id_publicacion INT NOT NULL,
     imagen_url TEXT NOT NULL,
     tiene_copyright BOOLEAN DEFAULT FALSE,
-    marca_agua VARCHAR(255), 
+    marca_agua BOOLEAN DEFAULT FALSE, 
     CONSTRAINT fk_publicacion_img FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE
 );
 

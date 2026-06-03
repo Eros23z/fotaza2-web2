@@ -24,9 +24,9 @@ const Post = {
         return rows[0].id_publicacion;
     },
 
-    addImage: async (id_publicacion, url, tiene_copyright) => {
-        const query = `INSERT INTO imagenes (id_publicacion, imagen_url, tiene_copyright) VALUES ($1, $2, $3)`;
-        await db.query(query, [id_publicacion, url, tiene_copyright]);
+    addImage: async (id_publicacion, url, tiene_copyright, marca_agua) => {
+        const query = `INSERT INTO imagenes (id_publicacion, imagen_url, tiene_copyright, marca_agua) VALUES ($1, $2, $3, $4)`;
+        await db.query(query, [id_publicacion, url, tiene_copyright, marca_agua]);
     },
 
     createTag: async (nombre_tag) => {

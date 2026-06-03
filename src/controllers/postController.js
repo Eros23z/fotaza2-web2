@@ -1,4 +1,7 @@
 const { Post, search } = require('../models/postModel');
+const applyWatermark = require('../services/imageService');
+const fs = require('fs');
+const path = require('path');
 
 exports.createPost = async (req, res) => {
     try {
@@ -10,11 +13,32 @@ exports.createPost = async (req, res) => {
         const cerrado = (comentarios_cerrados === '1');
 
         const id_publicacion = await Post.create(titulo, descripcion, user, cerrado);
+        let marca_agua = false;
         if (req.files && req.files.length > 0) {
             for (const file of req.files) {
-                const urlImagen = `/uploads/${file.filename}`;
+                let urlImagen = `/uploads/${file.filename}`; 
                 const copyright = (tiene_copyright === '1');
-                await Post.addImage(id_publicacion, urlImagen, copyright);
+                if (copyright) {
+                    try {
+                        const imagenOriginal = path.join(process.cwd(), 'public', 'uploads', file.filename);
+                        const resultado = await applyWatermark(imagenOriginal, file.originalname);
+                        const nombreFinal = resultado.filename;
+                        
+                        const dirDestino = path.join(process.cwd(), 'public', 'watermark-images');
+                        await fs.promises.mkdir(dirDestino, { recursive: true });
+                        const rutaCompleta = path.join(dirDestino, nombreFinal);
+ 
+                        await fs.promises.writeFile(rutaCompleta, resultado.buffer);
+                        urlImagen = `/watermark-images/${nombreFinal}`;
+                        marca_agua = true;
+                    } catch (error) {
+                        return res.status(500).send('Error al aplicar marca de agua, intenta de nuevo');
+                    }
+                } else {
+                    urlImagen = `/uploads/${file.filename}`;
+                    marca_agua = false;
+                }
+                await Post.addImage(id_publicacion, urlImagen, copyright, marca_agua);
             }
         }
         if (nombre_tag && nombre_tag.length > 0) {
