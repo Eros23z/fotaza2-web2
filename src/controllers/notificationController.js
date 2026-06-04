@@ -11,7 +11,7 @@ exports.interestPostNotification = async (req, res) => {
         const fecha_notificacion = new Date();
         await Notification.createNotification(id_publicacion, id_usuario_destino, id_usuario_origen, 'me_interesa', fecha_notificacion);
         await Message.createMessage(id_usuario_origen, id_usuario_destino, '¡Hola! Vi tu publicación y me interesa', fecha_notificacion);
-        res.redirect(`/posts-detail/${id_publicacion}`);
+        res.redirect(`/messages/${id_usuario_destino}`);
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al notificar el interés');

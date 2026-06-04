@@ -12,6 +12,7 @@ html(lang="es")
           a(href="/") Inicio
           if user
             a(href="/create-post") Nueva Publicación
+            a(href="/messages") Mensajes
             if user.rol === 'validador'
               a(href="/admin/reports") Moderación
             

@@ -12,6 +12,7 @@ const userController = require('./controllers/userController');
 const commentController = require('./controllers/commentController');
 const rateController = require('./controllers/rateController');
 const followController = require('./controllers/followController');
+const messagesController = require('./controllers/messagesController');
 const isValidador = require('./middlewares/validador');
 const reportController = require('./controllers/reportController');
 const notificationController = require('./controllers/notificationController');
@@ -119,6 +120,10 @@ app.post('/admin/reports/:id_denuncia/takedown', protect, isValidador, reportCon
 
 app.post('/interest/:id_publicacion', protect, notificationController.interestPostNotification);
 app.get('/notifications', protect, notificationController.getNotifications);
+
+app.get('/messages', protect, messagesController.getMessages);
+app.get('/messages/:id_usuario_recibe', protect, messagesController.getConversation);
+app.post('/messages/:id_usuario_recibe/send', protect, messagesController.sendMesssages);
 
 app.get('/register', (req, res) => {
     if (req.user) return res.redirect('/');
