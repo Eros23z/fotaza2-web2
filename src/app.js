@@ -5,11 +5,16 @@ const cookieParser = require('cookie-parser');
 const { protect } = require('./middlewares/authMiddleware');
 const { Post } = require('./models/postModel');
 const User = require('./models/userModel');
+const Follow = require('./models/followModel');
 const authController = require('./controllers/authController');
 const postController = require('./controllers/postController');
 const userController = require('./controllers/userController');
+const commentController = require('./controllers/commentController');
+const rateController = require('./controllers/rateController');
+const followController = require('./controllers/followController');
 const isValidador = require('./middlewares/validador');
 const reportController = require('./controllers/reportController');
+const notificationController = require('./controllers/notificationController');
 
 const app = express();
 const port = process.env.PORT;
@@ -33,6 +38,18 @@ app.use((req, res, next) => {
     next();
 });
 
+const Notification = require('./models/NotificationModel');
+app.use(async (req, res, next) => {
+    if (req.user) {
+        try {
+            res.locals.notifications = await Notification.getNotifications(req.user.id);
+        } catch (error) {
+            console.error('Error al cargar las notificaciones:', error);
+        }
+    }
+    next();
+});
+
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -42,7 +59,7 @@ app.get('/', protect, async (req, res) => {
         res.render('index', { title: 'Fotaza 2', posts: posts });
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error al cargar la página principal');
+        res.status(500).send('Error al cargar la pagina principal');
     }
 });
 
@@ -53,8 +70,8 @@ app.get('/create-post', protect, (req, res) => {
 });
 
 app.get('/posts-detail/:id_publicacion', protect, postController.getPostDetail);
-app.post('/posts-detail/:id_publicacion/comments', protect, postController.addComments);
-app.post('/posts-detail/:id_publicacion/rate', protect, postController.addRating);
+app.post('/posts-detail/:id_publicacion/comments', protect, commentController.addComments);
+app.post('/posts-detail/:id_publicacion/rate', protect, rateController.addRating);
 
 app.get('/following', protect, async (req, res) => {
     try {
@@ -66,17 +83,17 @@ app.get('/following', protect, async (req, res) => {
     }
 });
 
-app.post('/users/:id_usuario/unfollow', protect, userController.unfollowUser);
-app.post('/users/:id_usuario/follow', protect, userController.followUser);
+app.post('/users/:id_usuario/unfollow', protect, followController.unfollowUser);
+app.post('/users/:id_usuario/follow', protect, followController.followUser);
 app.get('/profile/:id_usuario', protect, async (req, res) => {
     try {
         const id_usuario = req.params.id_usuario;
         const userProfile = await User.getProfile(id_usuario);
         const currentUser = req.user.id;
         const isOwnProfile = currentUser === userProfile.id_usuario;
-        const isFollowing = isOwnProfile ? false : await User.isFollowing(currentUser, userProfile.id_usuario);
-        const followersCount = await User.countFollowers(id_usuario);
-        const followingCount = await User.countFollowing(id_usuario);
+        const isFollowing = isOwnProfile ? false : await Follow.isFollowing(currentUser, userProfile.id_usuario);
+        const followersCount = await Follow.countFollowers(id_usuario);
+        const followingCount = await Follow.countFollowing(id_usuario);
         const userPosts = await Post.getPostsByUser(id_usuario);
 
         res.render('profile', {
@@ -99,6 +116,9 @@ app.post('/posts-detail/:id_publicacion/report', protect, reportController.repor
 app.get('/admin/reports', protect, isValidador, reportController.getPendingReports);
 app.post('/admin/reports/:id_denuncia/dismiss', protect, isValidador, reportController.dismissReport);
 app.post('/admin/reports/:id_denuncia/takedown', protect, isValidador, reportController.takeDownReport);
+
+app.post('/interest/:id_publicacion', protect, notificationController.interestPostNotification);
+app.get('/notifications', protect, notificationController.getNotifications);
 
 app.get('/register', (req, res) => {
     if (req.user) return res.redirect('/');

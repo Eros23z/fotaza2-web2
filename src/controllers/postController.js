@@ -1,4 +1,5 @@
 const { Post, search } = require('../models/postModel');
+const Rate = require('../models/rateModel');
 const applyWatermark = require('../services/imageService');
 const fs = require('fs');
 const path = require('path');
@@ -73,7 +74,7 @@ exports.getPostDetail = async (req, res) => {
         if (req.user && post) {
             isAuthor = (req.user.id === post.id_usuario);
             if (post.id_imagen) {
-                userHasRated = await Post.userHasRated(req.user.id, post.id_imagen);
+                userHasRated = await Rate.userHasRated(req.user.id, post.id_imagen);
             }
         }
         
@@ -89,30 +90,6 @@ exports.getPostDetail = async (req, res) => {
     }
 }
 
-exports.getComments = async (req, res) => {
-    try {
-        const { id_publicacion } = req.params;
-        const comments = await Post.getComments(id_publicacion);
-        res.render('post-detail', { title: 'Detalles de la publicación', post: comments });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al obtener los comentarios');
-    }
-}
-
-exports.addComments = async (req, res) => {
-    try {
-        const { id_publicacion } = req.params;
-        const { texto_comentario } = req.body;
-        const user = req.user.id;
-        await Post.addComments(id_publicacion, user, texto_comentario);
-        res.redirect(`/posts-detail/${id_publicacion}`);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al agregar el comentario');
-    }
-}
-
 exports.searchPosts = async (req, res) => {
     try {
         const { buscar } = req.query;
@@ -124,38 +101,6 @@ exports.searchPosts = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al buscar publicaciones');
-    }
-}
-
-exports.addRating = async (req, res) => {
-    try {
-        const { id_publicacion } = req.params;
-        const { puntaje } = req.body;
-        const user = req.user.id;
-        
-        const post = await Post.getPostDetail(id_publicacion);
-        if (!post) {
-            return res.status(404).send('Publicación no encontrada');
-        }
-        
-        if (!post.id_imagen) {
-            return res.status(400).send('Esta publicación no tiene una imagen para valorar');
-        }
-        
-        if (user === post.id_usuario) {
-            return res.status(403).send('No puedes valorar tu propia publicación');
-        }
-        
-        const userRated = await Post.userHasRated(user, post.id_imagen);
-        if (userRated) {
-            return res.status(403).send('Ya has valorado esta publicación');
-        }
-        
-        await Post.addRating(user, post.id_imagen, parseInt(puntaje));
-        res.redirect(`/posts-detail/${id_publicacion}`);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al agregar la valoración');
     }
 }
 

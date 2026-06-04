@@ -1,0 +1,38 @@
+extends layout
+
+block content
+  h1 Notificaciones
+  
+  .notifications-container
+    if notifications && notifications.length > 0
+      ul.notifications-list
+        each n in notifications
+          li(class=`notification-item ${n.leida ? 'read' : 'unread'}`)
+            .notif-body
+              if n.tipo_evento === 'nuevo_seguidor'
+                p El usuario 
+                  strong @#{n.username}
+                  |  comenzó a seguirte.
+              else if n.tipo_evento === 'comentario'
+                p El usuario 
+                  strong @#{n.username}
+                  |  comentó en tu publicación.
+                if n.id_publicacion
+                  a(href=`/posts-detail/${n.id_publicacion}` class="btn-notif-link") Ver post
+              else if n.tipo_evento === 'valoracion'
+                p El usuario 
+                  strong @#{n.username}
+                  |  valoró la imagen de tu publicación.
+                if n.id_publicacion
+                  a(href=`/posts-detail/${n.id_publicacion}` class="btn-notif-link") Ver post
+              else if n.tipo_evento === 'me_interesa'
+                p El usuario 
+                  strong @#{n.username}
+                  |  está interesado en tu publicación.
+                if n.id_publicacion
+                  a(href=`/posts-detail/${n.id_publicacion}` class="btn-notif-link") Ver post
+            span.notif-date #{new Date(n.fecha_notificacion).toLocaleDateString()}
+    else
+      .no-notifications
+        p No tienes notificaciones por el momento.
+        a(href="/" class="btn-detail") Volver al inicio

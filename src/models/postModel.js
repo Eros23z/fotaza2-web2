@@ -88,31 +88,9 @@ const Post = {
         return post;
     },
 
-    addComments: async (id_publicacion, id_usuario, comentario) => {
-        const query = `INSERT INTO comentarios (id_publicacion, id_usuario, texto_comentario) VALUES ($1, $2, $3)`;
-        await db.query(query, [id_publicacion, id_usuario, comentario]);
-    },
-
-    addRating: async (id_usuario, id_imagen, puntaje) => {
-        const query = `INSERT INTO valoraciones_imagen (id_usuario, id_imagen, puntaje) VALUES ($1, $2, $3)`;
-        await db.query(query, [id_usuario, id_imagen, puntaje]);
-    },
-
     getAuthor: async (id_publicacion) => {
         const query = `SELECT id_usuario FROM publicaciones WHERE id_publicacion = $1`;
         const { rows } = await db.query(query, [id_publicacion]);
-        return rows[0];
-    },
-
-    userHasRated: async (id_usuario, id_imagen) => {
-        const query = `SELECT * FROM valoraciones_imagen WHERE id_usuario = $1 AND id_imagen = $2`;
-        const { rows } = await db.query(query, [id_usuario, id_imagen]);
-        return rows.length > 0;
-    },
-
-    getAverageRating: async (id_imagen) => {
-        const query = `SELECT AVG(puntaje) as promedio FROM valoraciones_imagen WHERE id_imagen = $1`;
-        const { rows } = await db.query(query, [id_imagen]);
         return rows[0];
     },
 
@@ -127,12 +105,6 @@ const Post = {
         `;
         const { rows } = await db.query(query, [id_usuario]);
         return rows;
-    },
-
-    getCommentAuthor: async (id_comentario) => {
-        const query = `SELECT id_usuario FROM comentarios WHERE id_comentario = $1`;
-        const { rows } = await db.query(query, [id_comentario]);
-        return rows[0];
     }
 };
 

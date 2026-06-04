@@ -14,6 +14,31 @@ html(lang="es")
             a(href="/create-post") Nueva Publicación
             if user.rol === 'validador'
               a(href="/admin/reports") Moderación
+            
+            //- Campanita de Notificaciones
+            div.notification-dropdown
+              details
+                summary.bell-icon #{notifications && notifications.filter(n => !n.leida).length > 0 ? `(${notifications.filter(n => !n.leida).length})` : ''}
+                div.dropdown-content
+                  if notifications && notifications.length > 0
+                    each n in notifications
+                      if n.tipo_evento === 'nuevo_seguidor'
+                        div.notif-item
+                          span @#{n.username} comenzó a seguirte.
+                      else if n.tipo_evento === 'comentario'
+                        a.notif-item(href=`/posts-detail/${n.id_publicacion}`)
+                          span @#{n.username} comentó tu publicación.
+                      else if n.tipo_evento === 'valoracion'
+                        a.notif-item(href=`/posts-detail/${n.id_publicacion}`)
+                          span @#{n.username} valoró tu imagen.
+                      else if n.tipo_evento === 'me_interesa'
+                        a.notif-item(href=`/posts-detail/${n.id_publicacion}`)
+                          span @#{n.username} tiene interés en tu post.
+                    div.dropdown-footer
+                      a(href="/notifications") Ver todas
+                  else
+                    div.notif-item.empty No tienes notificaciones.
+            
             a(href="/logout") Salir
           else
             a(href="/login") Entrar

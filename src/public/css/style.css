@@ -495,3 +495,143 @@ footer {
 .btn-report:hover {
     background-color: #a93226;
 }
+
+/* Estilos de notificaciones y "Me interesa" */
+.notification-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.bell-icon {
+    font-size: 1.1em;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    padding: 0 10px;
+}
+
+.bell-icon::-webkit-details-marker {
+    display: none;
+}
+
+.dropdown-content {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: white;
+    min-width: 280px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    z-index: 1000;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.notif-item {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    font-size: 0.85em;
+    text-align: left;
+}
+
+.notif-item:hover {
+    background-color: #f5f7f8;
+}
+
+.notif-item.empty {
+    color: #7f8c8d;
+    text-align: center;
+    font-style: italic;
+}
+
+.dropdown-footer {
+    background: #f9f9f9;
+    text-align: center;
+}
+
+.dropdown-footer a {
+    display: block;
+    padding: 8px;
+    font-size: 0.8em;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.dropdown-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Botón Me interesa */
+.btn-interest {
+    padding: 10px 15px;
+    background-color: #e67e22;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.95em;
+}
+
+.btn-interest:hover {
+    background-color: #d35400;
+}
+
+/* Página principal de notificaciones */
+.notifications-container {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.notifications-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.notification-item {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.notification-item.unread {
+    border-left: 4px solid #3498db;
+    background-color: #f7f9fa;
+}
+
+.notif-body p {
+    margin: 0 0 10px 0;
+}
+
+.notif-date {
+    font-size: 0.8em;
+    color: #7f8c8d;
+    white-space: nowrap;
+}
+
+.btn-notif-link {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.btn-notif-link:hover {
+    background-color: #2980b9;
+}

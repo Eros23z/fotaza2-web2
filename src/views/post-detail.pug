@@ -37,6 +37,9 @@ block content
                 button(type="submit" class="btn-rate") Enviar valoración
           
           .post-body
+            if !isAuthor
+              form(action=`/interest/${post.id_publicacion}` method="POST" class="interest-form" style="margin-bottom: 15px;")
+                button(type="submit" class="btn-interest") Me interesa / Contactar
             p= post.descripcion
             
             .report-section

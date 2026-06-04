@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS imagenes CASCADE;
 DROP TABLE IF EXISTS publicaciones CASCADE;
 DROP TABLE IF EXISTS seguidores CASCADE;
 DROP TABLE IF EXISTS usuarios CASCADE;
+DROP TABLE IF EXISTS mensajes CASCADE;
 
 CREATE TABLE usuarios (
     id_usuario SERIAL PRIMARY KEY,
@@ -126,11 +127,23 @@ CREATE TABLE notificaciones (
     id_notificacion SERIAL PRIMARY KEY,
     id_usuario_destino INT NOT NULL,
     id_usuario_origen INT NOT NULL,
+    id_publicacion INT,
     tipo_evento VARCHAR(100) NOT NULL CHECK (tipo_evento IN ('comentario', 'valoracion', 'me_interesa', 'nuevo_seguidor')),
     leida BOOLEAN DEFAULT FALSE,
     fecha_notificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_usuario_destino_not FOREIGN KEY (id_usuario_destino) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-    CONSTRAINT fk_usuario_origen_not FOREIGN KEY (id_usuario_origen) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+    CONSTRAINT fk_usuario_origen_not FOREIGN KEY (id_usuario_origen) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    CONSTRAINT fk_publicacion_not FOREIGN KEY (id_publicacion) REFERENCES publicaciones(id_publicacion) ON DELETE CASCADE
+);
+
+CREATE TABLE mensajes (
+    id_mensaje SERIAL PRIMARY KEY,
+    id_usuario_envia INT NOT NULL,
+    id_usuario_recibe INT NOT NULL,
+    texto_mensaje TEXT NOT NULL,
+    fecha_mensaje TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_usuario_envia_msg FOREIGN KEY (id_usuario_envia) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    CONSTRAINT fk_usuario_recibe_msg FOREIGN KEY (id_usuario_recibe) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
 
