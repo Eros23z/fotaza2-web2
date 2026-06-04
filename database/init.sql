@@ -128,7 +128,7 @@ CREATE TABLE notificaciones (
     id_usuario_destino INT NOT NULL,
     id_usuario_origen INT NOT NULL,
     id_publicacion INT,
-    tipo_evento VARCHAR(100) NOT NULL CHECK (tipo_evento IN ('comentario', 'valoracion', 'me_interesa', 'nuevo_seguidor')),
+    tipo_evento VARCHAR(100) NOT NULL CHECK (tipo_evento IN ('comentario', 'valoracion', 'me_interesa', 'nuevo_seguidor', 'guardada')),
     leida BOOLEAN DEFAULT FALSE,
     fecha_notificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_usuario_destino_not FOREIGN KEY (id_usuario_destino) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
@@ -148,7 +148,118 @@ CREATE TABLE mensajes (
 
 
 
---INSERT INTO usuarios (nombre, apellido, username, email, password, fecha_nacimiento, rol) 
---VALUES 
---('Admin', 'Validador', 'admin_validador', 'admin@fotaza.com', '$2b$10$EjemploHashBCryptAca...', '1990-01-01', 'validador'),
---('Eros', 'Dev', 'eros_dev', 'eros@fotaza.com', '$2b$10$EjemploHashBCryptAca...', '2000-05-15', 'usuario');
+INSERT INTO usuarios (nombre, apellido, username, email, password, fecha_nacimiento, rol, estado) 
+VALUES 
+('Admin', 'Validador', 'admin_validador', 'admin@fotaza.com', '$2b$10$EokGvk4qSyPSH.3C72swvuO58CSwJ6d2wVY0FujmwdeDEnsBg2Af.', '1990-01-01', 'validador', 'activo'),
+('Eros', 'Dev', 'eros_dev', 'eros@fotaza.com', '$2b$10$EokGvk4qSyPSH.3C72swvuO58CSwJ6d2wVY0FujmwdeDEnsBg2Af.', '2000-05-15', 'usuario', 'activo'),
+('Juan', 'Perez', 'juan_perez', 'juan@fotaza.com', '$2b$10$EokGvk4qSyPSH.3C72swvuO58CSwJ6d2wVY0FujmwdeDEnsBg2Af.', '1995-08-20', 'usuario', 'activo'),
+('Maria', 'Gomez', 'maria_gomez', 'maria@fotaza.com', '$2b$10$EokGvk4qSyPSH.3C72swvuO58CSwJ6d2wVY0FujmwdeDEnsBg2Af.', '1998-12-10', 'usuario', 'activo'),
+('Usuario', 'Bloqueado', 'user_blocked', 'blocked@fotaza.com', '$2b$10$EokGvk4qSyPSH.3C72swvuO58CSwJ6d2wVY0FujmwdeDEnsBg2Af.', '1992-04-05', 'usuario', 'inactivo');
+
+-- Publicaciones de ejemplo
+INSERT INTO publicaciones (id_usuario, titulo, descripcion, comentarios_cerrados, filtrada)
+VALUES
+(2, 'Atardecer en la montaña', 'Un hermoso atardecer tomado en las sierras cordobesas.', FALSE, FALSE),
+(2, 'Luces de la ciudad', 'Fotografía nocturna de larga exposición del centro de la ciudad.', FALSE, FALSE),
+(3, 'Bosque de Pinos', 'Caminata matutina rodeado de naturaleza y aroma a pino.', FALSE, FALSE),
+(4, 'Retrato Minimalista', 'Estudio de luces y sombras en retrato blanco y negro.', FALSE, FALSE),
+(3, 'Publicacion Indecente', 'Este post va a ser denunciado y dado de baja para pruebas de baneo.', FALSE, FALSE);
+
+-- Imágenes asociadas a publicaciones
+-- Nota: Usamos URLs ficticias / de ejemplo que apunten a imágenes públicas de Unsplash para pruebas visuales bonitas
+INSERT INTO imagenes (id_publicacion, imagen_url, tiene_copyright, marca_agua)
+VALUES
+(1, 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800', FALSE, FALSE),
+(2, 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800', TRUE, TRUE),
+(3, 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800', FALSE, FALSE),
+(4, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800', TRUE, FALSE),
+(5, 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=800', FALSE, FALSE);
+
+-- Etiquetas
+INSERT INTO etiquetas (nombre_tag)
+VALUES
+('paisajes'),
+('nocturna'),
+('naturaleza'),
+('retrato'),
+('test');
+
+-- Relación Publicación - Etiqueta
+INSERT INTO publicacion_etiqueta (id_publicacion, id_tag)
+VALUES
+(1, 1),
+(1, 3),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5);
+
+-- Comentarios
+INSERT INTO comentarios (id_usuario, id_publicacion, texto_comentario, filtrado)
+VALUES
+(3, 1, '¡Qué foto tan increíble! Me encanta la iluminación.', FALSE),
+(4, 1, 'Impresionante atardecer, felicitaciones.', FALSE),
+(2, 3, 'Hermoso bosque, ¿dónde queda?', FALSE),
+(3, 4, 'Me gusta el contraste del blanco y negro.', FALSE),
+(4, 3, 'Este comentario es ofensivo y será denunciado', FALSE);
+
+-- Valoraciones (Ratings)
+INSERT INTO valoraciones_imagen (id_usuario, id_imagen, puntaje)
+VALUES
+(3, 1, 5),
+(4, 1, 5), -- Atardecer tiene promedio 5.0 (2 votos) - Altamente valorada
+(3, 2, 4),
+(4, 2, 5), -- Luces de la ciudad tiene promedio 4.5 (2 votos) - Altamente valorada
+(2, 3, 3), -- Bosque de Pinos tiene promedio 3.0 (1 voto)
+(2, 4, 4); -- Retrato tiene promedio 4.0 (1 voto)
+
+-- Seguidores
+INSERT INTO seguidores (id_seguidor, id_seguido)
+VALUES
+(2, 3), -- Eros sigue a Juan
+(2, 4), -- Eros sigue a Maria
+(3, 2), -- Juan sigue a Eros
+(4, 2); -- Maria sigue a Eros
+
+-- Mensajes privados
+INSERT INTO mensajes (id_usuario_envia, id_usuario_recibe, texto_mensaje, fecha_mensaje)
+VALUES
+(3, 2, 'Hola Eros, me interesa comprar tu foto de atardecer.', NOW() - INTERVAL '1 hour'),
+(2, 3, 'Hola Juan! Claro, charlemos sobre los detalles de la licencia.', NOW() - INTERVAL '45 minutes'),
+(3, 2, 'Genial, ¿aceptás transferencia?', NOW() - INTERVAL '30 minutes');
+
+-- Colecciones
+INSERT INTO colecciones (id_usuario, nombre_coleccion)
+VALUES
+(2, 'Favoritos'), -- Colección privada por defecto de Eros
+(2, 'Naturaleza y Paisajes'),
+(3, 'Favoritos'),
+(3, 'Inspiración urbana');
+
+-- Agregar publicaciones a colecciones
+INSERT INTO coleccion_publicacion (id_coleccion, id_publicacion)
+VALUES
+(1, 1),
+(2, 1),
+(2, 3),
+(4, 2);
+
+-- Denuncias
+INSERT INTO denuncias (id_denunciante, id_publicacion, id_comentario, motivo, descripcion, estado)
+VALUES
+(3, 2, NULL, 'Copyright', 'Creo que esta foto no es del autor original, reclamo derechos.', 'Pendiente'),
+(2, NULL, 5, 'Contenido inapropiado', 'El comentario de Maria es ofensivo.', 'Pendiente');
+
+-- Notificaciones
+INSERT INTO notificaciones (id_usuario_destino, id_usuario_origen, id_publicacion, tipo_evento, leida)
+VALUES
+(2, 3, 1, 'comentario', FALSE),
+(2, 4, 1, 'comentario', TRUE),
+(2, 3, 1, 'valoracion', FALSE),
+(2, 3, NULL, 'nuevo_seguidor', FALSE);
+
+-- Credenciales de administrador: admin@fotaza.com y la contraseña es: admin123
+-- Credenciales de un usuario regular: eros@fotaza.com y la contraseña es: admin123
+-- Credenciales de juan perez: juan@fotaza.com y la contraseña es: admin123
+-- Credenciales de maria gomez: maria@fotaza.com y la contraseña es: admin123
+-- Credenciales de usuario bloqueado: blocked@fotaza.com y la contraseña es: admin123
