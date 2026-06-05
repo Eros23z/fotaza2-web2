@@ -17,6 +17,16 @@ const Notification = {
         const { rows } = await db.query(query, [id_usuario]);
         return rows;
     },
+
+    markAsRead: async (id_notificacion, id_usuario_destino) => {
+        const query = `UPDATE notificaciones SET leida = true WHERE id_notificacion = $1 AND id_usuario_destino = $2`;
+        await db.query(query, [id_notificacion, id_usuario_destino]);
+    },
+
+    markAllAsRead: async (id_usuario_destino) => {
+        const query = `UPDATE notificaciones SET leida = true WHERE id_usuario_destino = $1`;
+        await db.query(query, [id_usuario_destino]);
+    }
 }
 
 module.exports = Notification;

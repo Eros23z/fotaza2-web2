@@ -42,3 +42,26 @@ exports.createNotification = async (req, res) => {
         res.status(500).send('Error al notificar el nuevo seguidor');
     }
 };
+
+exports.markAsRead = async (req, res) => {
+    try {
+        const { id_notificacion } = req.params;
+        const id_usuario = req.user.id;
+        await Notification.markAsRead(id_notificacion, id_usuario);
+        res.redirect('/notifications');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al marcar la notificación como leída');
+    }
+};
+
+exports.markAllAsRead = async (req, res) => {
+    try {
+        const id_usuario = req.user.id;
+        await Notification.markAllAsRead(id_usuario);
+        res.redirect('/notifications');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al marcar todas las notificaciones como leídas');
+    }
+};
