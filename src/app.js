@@ -16,6 +16,7 @@ const messagesController = require('./controllers/messagesController');
 const isValidador = require('./middlewares/validador');
 const reportController = require('./controllers/reportController');
 const notificationController = require('./controllers/notificationController');
+const collectionController = require('./controllers/collectionController');
 
 const app = express();
 const port = process.env.PORT;
@@ -54,7 +55,7 @@ app.use(async (req, res, next) => {
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
-app.get('/', protect, async (req, res) => {
+app.get('/', async (req, res) => {
     try {
         const posts = await Post.getAllWithImages();
         res.render('index', { title: 'Fotaza 2', posts: posts });
@@ -70,9 +71,10 @@ app.get('/create-post', protect, (req, res) => {
     res.render('create-post', { title: 'Crear publicación' });
 });
 
-app.get('/posts-detail/:id_publicacion', protect, postController.getPostDetail);
+app.get('/posts-detail/:id_publicacion', postController.getPostDetail);
 app.post('/posts-detail/:id_publicacion/comments', protect, commentController.addComments);
 app.post('/posts-detail/:id_publicacion/rate', protect, rateController.addRating);
+app.post('/posts-detail/:id_publicacion/close-comments', protect, postController.closeComments);
 
 app.get('/following', protect, async (req, res) => {
     try {
@@ -114,16 +116,29 @@ app.get('/profile/:id_usuario', protect, async (req, res) => {
 });
 
 app.post('/posts-detail/:id_publicacion/report', protect, reportController.reportPost);
+app.post('/comments/:id_comentario/report', protect, reportController.reportComment);
+app.get('/profile/moderation/comments', protect, reportController.getCommentReportsForAuthor);
+app.post('/profile/moderation/comments/:id_denuncia/dismiss', protect, reportController.dismissCommentReport);
+app.post('/profile/moderation/comments/:id_denuncia/delete', protect, reportController.deleteCommentByAuthor);
 app.get('/admin/reports', protect, isValidador, reportController.getPendingReports);
 app.post('/admin/reports/:id_denuncia/dismiss', protect, isValidador, reportController.dismissReport);
 app.post('/admin/reports/:id_denuncia/takedown', protect, isValidador, reportController.takeDownReport);
 
 app.post('/interest/:id_publicacion', protect, notificationController.interestPostNotification);
 app.get('/notifications', protect, notificationController.getNotifications);
+app.post('/notifications/:id_notificacion/read', protect, notificationController.markAsRead);
+app.post('/notifications/read-all', protect, notificationController.markAllAsRead);
 
 app.get('/messages', protect, messagesController.getMessages);
 app.get('/messages/:id_usuario_recibe', protect, messagesController.getConversation);
 app.post('/messages/:id_usuario_recibe/send', protect, messagesController.sendMesssages);
+
+app.post('/collections', protect, collectionController.createCollection);
+app.post('/collections/:id_collection/add/:id_publicacion', protect, collectionController.addPostToCollection);
+app.post('/collections/:id_collection/delete/:id_publicacion', protect, collectionController.deletePublicationFromCollection);
+app.post('/collections/:id_collection/delete', protect, collectionController.deleteCollection);
+app.get('/collections/:id_collection', protect, collectionController.getPostsInCollection);
+app.get('/my-collections', protect, collectionController.getUserCollections);
 
 app.get('/register', (req, res) => {
     if (req.user) return res.redirect('/');
@@ -136,8 +151,7 @@ app.get('/login', (req, res) => {
 });
 
 const upload = require('./middlewares/upload');
-const { report } = require('process');
-app.post('/create-post', protect, upload.array('imagen', 5), postController.createPost);
+app.post('/create-post', protect, upload.array('imagen'), postController.createPost);
 app.post('/register', authController.postRegister);
 app.post('/login', authController.postLogin);
 app.get('/logout', authController.logout);
