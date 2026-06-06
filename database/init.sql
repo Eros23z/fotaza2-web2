@@ -245,7 +245,7 @@ VALUES
 (4, 2);
 
 -- Denuncias
-INSERT INTO denuncias (id_denunciante, id_publicacion, id_comentario, motivo, descripcion, estado)
+INSERT INTO denuncias (id_usuario_denunciante, id_publicacion, id_comentario, motivo, descripcion, estado)
 VALUES
 (3, 2, NULL, 'Copyright', 'Creo que esta foto no es del autor original, reclamo derechos.', 'Pendiente'),
 (2, NULL, 5, 'Contenido inapropiado', 'El comentario de Maria es ofensivo.', 'Pendiente');
