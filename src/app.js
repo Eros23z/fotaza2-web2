@@ -61,7 +61,7 @@ app.get('/', async (req, res) => {
         res.render('index', { title: 'Fotaza 2', posts: posts });
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error al cargar la pagina principal');
+        res.status(500).send('Error al cargar la pagina principal: ' + error.message + '\nStack: ' + error.stack);
     }
 });
 
