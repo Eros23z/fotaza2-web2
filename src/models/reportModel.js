@@ -78,6 +78,21 @@ const Report = {
         const query = `SELECT id_publicacion FROM comentarios WHERE id_comentario = $1`;
         const { rows } = await db.query(query, [id_comentario]);
         return rows[0];
+    },
+
+    getCommentReportsForAuthor: async (id_autor) => {
+        const query = `
+            SELECT d.*, u.username as username_denunciante,
+                   c.texto_comentario, c.id_publicacion, p.titulo as titulo_publicacion
+            FROM denuncias d
+            JOIN usuarios u ON d.id_denunciante = u.id_usuario
+            JOIN comentarios c ON d.id_comentario = c.id_comentario
+            JOIN publicaciones p ON c.id_publicacion = p.id_publicacion
+            WHERE p.id_usuario = $1 AND d.estado = 'Pendiente'
+            ORDER BY d.fecha_denuncia DESC;
+        `;
+        const { rows } = await db.query(query, [id_autor]);
+        return rows;
     }
 }
 

@@ -10,6 +10,17 @@ const Comment = {
         const query = `SELECT id_usuario FROM comentarios WHERE id_comentario = $1`;
         const { rows } = await db.query(query, [id_comentario]);
         return rows[0];
+    },
+
+    getCommentPostAuthor: async (id_comentario) => {
+        const query = `
+            SELECT p.id_usuario 
+            FROM comentarios c
+            JOIN publicaciones p ON c.id_publicacion = p.id_publicacion
+            WHERE c.id_comentario = $1
+        `;
+        const { rows } = await db.query(query, [id_comentario]);
+        return rows[0];
     }
 };
 
