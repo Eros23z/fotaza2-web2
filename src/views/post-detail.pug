@@ -11,68 +11,171 @@ block content
             a(href=`/profile/${post.id_usuario}`)
               span.username Por: #{post.username}
           
-          .post-image
-            img(src=post.imagen_url, alt=post.titulo)
-          
-          .post-rating
-            h3 Valoración de la Imagen
-            if post.valoracion && post.valoracion.promedio
-              p Promedio: #{Number(post.valoracion.promedio).toFixed(1)} / 5 (Votos: #{post.valoracion.total_votos})
-            else
-              p Promedio: Sin valoraciones aún
-            
-            if isAuthor
-              p.rating-message No puedes valorar tu propia publicación.
-            else if userHasRated
-              p.rating-message ¡Ya has valorado esta imagen! Gracias.
-            else
-              form(action=`/posts-detail/${post.id_publicacion}/rate` method="POST" class="rating-form")
-                label(for="puntaje") Tu valoración: 
-                select(name="puntaje" id="puntaje")
-                  option(value="5") 5 - Excelente
-                  option(value="4") 4 - Muy buena
-                  option(value="3") 3 - Buena
-                  option(value="2") 2 - Regular
-                  option(value="1") 1 - Mala
-                button(type="submit" class="btn-rate") Enviar valoración
+          each img, index in post.imagenes
+            div(style="border: 1px solid #eee; border-radius: 6px; overflow: hidden; margin-bottom: 25px; background-color: #fafafa; box-shadow: 0 1px 3px rgba(0,0,0,0.05);")
+              .post-image
+                img(src=img.imagen_url, alt=`Imagen ${index + 1} de ${post.titulo}` style="width: 100%; display: block;")
+              
+              div(style="padding: 15px;")
+                p(style="font-size: 0.9em; margin: 0 0 10px 0; color: #7f8c8d;")
+                  if img.tiene_copyright
+                    span(style="background-color: #e74c3c; color: white; padding: 3px 6px; border-radius: 3px; font-weight: bold; margin-right: 10px; font-size: 0.8em;") Copyright
+                    if img.marca_agua
+                      span(style="font-style: italic; font-size: 0.9em;") Imagen protegida con marca de agua.
+                  else
+                    span(style="background-color: #27ae60; color: white; padding: 3px 6px; border-radius: 3px; font-weight: bold; font-size: 0.8em;") Dominio Público
+
+                .post-rating(style="background: transparent; border: none; padding: 0; margin-top: 10px;")
+                  h3(style="font-size: 1em; margin: 0 0 5px 0;") Valoración de la Imagen
+                  if img.total_votos > 0
+                    p(style="font-size: 0.9em; margin: 0 0 10px 0; font-weight: bold;") Promedio: #{Number(img.promedio).toFixed(1)} / 5 (Votos: #{img.total_votos})
+                  else
+                    p(style="font-size: 0.9em; margin: 0 0 10px 0; color: #7f8c8d;") Promedio: Sin valoraciones aún
+                  
+                  if user
+                    if isAuthor
+                      p.rating-message No puedes valorar tu propia publicación.
+                    else if ratedImageIds && ratedImageIds.includes(img.id_imagen)
+                      p.rating-message ¡Ya has valorado esta imagen! Gracias.
+                    else
+                      form(action=`/posts-detail/${post.id_publicacion}/rate` method="POST" class="rating-form" style="margin-top: 5px;")
+                        input(type="hidden" name="id_imagen" value=img.id_imagen)
+                        label(for=`puntaje-${img.id_imagen}` style="font-size: 0.85em;") Tu valoración: 
+                        select(name="puntaje" id=`puntaje-${img.id_imagen}`)
+                          option(value="5") 5 - Excelente
+                          option(value="4") 4 - Muy buena
+                          option(value="3") 3 - Buena
+                          option(value="2") 2 - Regular
+                          option(value="1") 1 - Mala
+                        button(type="submit" class="btn-rate" style="margin-left: 10px;") Enviar valoración
+                  else
+                    p.rating-message Inicia sesión para valorar esta imagen.
           
           .post-body
-            if !isAuthor
+            if user && !isAuthor
               form(action=`/interest/${post.id_publicacion}` method="POST" class="interest-form" style="margin-bottom: 15px;")
                 button(type="submit" class="btn-interest") Me interesa / Contactar
+            
+            if user && collections && collections.length > 0
+              form(id="save-to-collection-form" style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;")
+                label(for="save-collection-select" style="font-weight: bold; font-size: 0.9em; color: #2c3e50;") Guardar en:
+                select(id="save-collection-select" required style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9em;")
+                  each col in collections
+                    option(value=col.id_collection) #{col.nombre_collection}
+                button(type="submit" id="btn-save-collection" style="background-color: #2980b9; color: white; border: none; padding: 6px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9em; transition: background-color 0.3s;") Guardar en colección
+            else if user
+              p(style="font-size: 0.9em; color: #7f8c8d; margin-bottom: 15px;")
+                a(href="/my-collections" style="color: #2980b9; text-decoration: none; font-weight: bold;") Crea una colección
+                span  para poder guardar esta publicación.
+
             p= post.descripcion
             
-            .report-section
-              details.report-details
-                summary.report-summary Denunciar esta publicación
-                form(action=`/posts-detail/${post.id_publicacion}/report` method="POST" class="report-form")
-                  input(type="hidden" name="id_publicacion" value=post.id_publicacion)
-                  div
-                    label(for="motivo") Motivo de la denuncia:
-                    select(name="motivo" id="motivo" required)
-                      option(value="") -- Selecciona un motivo --
-                      option(value="Spam") Spam
-                      option(value="Contenido inapropiado") Contenido inapropiado
-                      option(value="Copyright") Derechos de autor / Copyright
-                      option(value="Otro") Otro
-                  div
-                    label(for="descripcion_denuncia") Detalles:
-                    textarea(name="descripcion" id="descripcion_denuncia" placeholder="Explica detalladamente por qué denuncias esta publicación..." required)
-                  button(type="submit" class="btn-report") Enviar Denuncia
+            if user
+              .report-section
+                details.report-details
+                  summary.report-summary Denunciar esta publicación
+                  form(action=`/posts-detail/${post.id_publicacion}/report` method="POST" class="report-form")
+                    input(type="hidden" name="id_publicacion" value=post.id_publicacion)
+                    div
+                      label(for="motivo") Motivo de la denuncia:
+                      select(name="motivo" id="motivo" required)
+                        option(value="") -- Selecciona un motivo --
+                        option(value="Spam") Spam
+                        option(value="Contenido inapropiado") Contenido inapropiado
+                        option(value="Copyright") Derechos de autor / Copyright
+                        option(value="Otro") Otro
+                    div
+                      label(for="descripcion_denuncia") Detalles:
+                      textarea(name="descripcion" id="descripcion_denuncia" placeholder="Explica detalladamente por qué denuncias esta publicación..." required)
+                    button(type="submit" class="btn-report") Enviar Denuncia
           
           .post-footer
-            if !post.comentarios_cerrados
-              form(action=`/posts-detail/${post.id_publicacion}/comments` method="POST")
-                textarea(name="texto_comentario", id="texto_comentario" placeholder="Escribe un comentario...")
-                button(type="submit") Comentar
+            if user
+              if isAuthor && !post.comentarios_cerrados
+                form(action=`/posts-detail/${post.id_publicacion}/close-comments` method="POST" style="margin-bottom: 15px;")
+                  button(type="submit" style="background-color: #c0392b; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;") Cerrar comentarios para esta publicación
+              if !post.comentarios_cerrados
+                form(action=`/posts-detail/${post.id_publicacion}/comments` method="POST")
+                  textarea(name="texto_comentario", id="texto_comentario" placeholder="Escribe un comentario...")
+                  button(type="submit") Comentar
+              else
+                p.comments-closed Los comentarios están cerrados para esta publicación.
             else
-              p.comments-closed Los comentarios están cerrados para esta publicación.
+              p.rating-message Inicia sesión para comentar.
             each comment in post.comentarios
-              .comment
-                p= comment.texto_comentario
-                span.username Por: #{comment.username_comentario}
+              .comment(style="border-bottom: 1px solid #eee; padding: 10px 0;")
+                p(style="margin: 5px 0;")= comment.texto_comentario
+                div(style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;")
+                  span.username Por: #{comment.username_comentario}
+                  if user && user.id !== comment.id_usuario
+                    details(style="margin-top: 5px;")
+                      summary(style="color: #c0392b; cursor: pointer; font-size: 0.8em; font-weight: bold; list-style: none;") Denunciar comentario
+                      form(action=`/comments/${comment.id_comentario}/report` method="POST" style="background-color: #fdf2f2; border: 1px solid #f5c6cb; border-radius: 4px; padding: 10px; margin-top: 5px; text-align: left; width: 250px;")
+                        div(style="margin-bottom: 5px;")
+                          label(for=`motivo-${comment.id_comentario}` style="font-size: 0.8em; font-weight: bold; color: #721c24; display: block;") Motivo:
+                          select(name="motivo" id=`motivo-${comment.id_comentario}` required style="font-size: 0.8em; padding: 4px; width: 100%;")
+                            option(value="") -- Seleccionar motivo --
+                            option(value="Spam") Spam
+                            option(value="Contenido inapropiado") Contenido inapropiado
+                            option(value="Copyright") Copyright
+                            option(value="Otro") Otro
+                        div(style="margin-bottom: 5px;")
+                          label(for=`desc-${comment.id_comentario}` style="font-size: 0.8em; font-weight: bold; color: #721c24; display: block;") Detalles:
+                          textarea(name="descripcion" id=`desc-${comment.id_comentario}` placeholder="Especifica el motivo..." required style="width: 100%; font-size: 0.8em; height: 40px; box-sizing: border-box;")
+                        button(type="submit" style="background-color: #c0392b; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 0.8em; font-weight: bold; cursor: pointer;") Enviar denuncia
     else
       .no-posts
         p No se encontro la publicacion
         if searchTerm
           a(href="/") Ver todas las publicaciones
+
+  script.
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('save-to-collection-form');
+      if (!form) return;
+      
+      const select = document.getElementById('save-collection-select');
+      const button = document.getElementById('btn-save-collection');
+      
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id_collection = select.value;
+        const id_publicacion = "#{post ? post.id_publicacion : ''}";
+        
+        button.disabled = true;
+        const originalText = button.textContent;
+        const originalBg = button.style.backgroundColor;
+        button.textContent = 'Guardando...';
+        
+        try {
+          const response = await fetch(`/collections/${id_collection}/add/${id_publicacion}`, {
+            method: 'POST',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'Accept': 'application/json'
+            }
+          });
+          const data = await response.json();
+          if (data.success) {
+            button.style.backgroundColor = '#27ae60';
+            button.textContent = '¡Guardado!';
+            setTimeout(() => {
+              button.disabled = false;
+              button.textContent = originalText;
+              button.style.backgroundColor = originalBg;
+            }, 2500);
+          } else {
+            alert(data.error || 'Error al guardar');
+            button.disabled = false;
+            button.textContent = originalText;
+            button.style.backgroundColor = originalBg;
+          }
+        } catch (error) {
+          console.error(error);
+          alert('Error al guardar la publicación');
+          button.disabled = false;
+          button.textContent = originalText;
+          button.style.backgroundColor = originalBg;
+        }
+      });
+    });

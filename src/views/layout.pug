@@ -13,10 +13,11 @@ html(lang="es")
           if user
             a(href="/create-post") Nueva Publicación
             a(href="/messages") Mensajes
+            a(href="/my-collections") Mis Colecciones
+            a(href="/profile/moderation/comments") Moderar Comentarios
             if user.rol === 'validador'
               a(href="/admin/reports") Moderación
             
-            //- Campanita de Notificaciones
             div.notification-dropdown
               details
                 summary.bell-icon #{notifications && notifications.filter(n => !n.leida).length > 0 ? `(${notifications.filter(n => !n.leida).length})` : ''}
@@ -35,6 +36,9 @@ html(lang="es")
                       else if n.tipo_evento === 'me_interesa'
                         a.notif-item(href=`/posts-detail/${n.id_publicacion}`)
                           span @#{n.username} tiene interés en tu post.
+                      else if n.tipo_evento === 'guardada'
+                        a.notif-item(href=`/posts-detail/${n.id_publicacion}`)
+                          span @#{n.username} guardó tu publicación en su colección.
                     div.dropdown-footer
                       a(href="/notifications") Ver todas
                   else

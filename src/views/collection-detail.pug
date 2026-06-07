@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  .collection-detail-container(style="max-width: 800px; margin: 0 auto; padding: 20px;")
+    header(style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;")
+      h1(style="margin: 0; color: #2c3e50;") Colección: #{collection.nombre_collection}
+      a(href="/my-collections" style="color: #34495e; text-decoration: none; font-weight: bold;") &larr; Volver a Mis Colecciones
+
+    if posts && posts.length > 0
+      .posts-grid(style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px;")
+        each post in posts
+          article.post-thumb-card(style="background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;")
+            if post.imagen_url
+              .thumb-image(style="height: 180px; overflow: hidden; background-color: #f0f0f0;")
+                img(src=post.imagen_url, alt=post.titulo style="width: 100%; height: 100%; object-fit: cover;")
+            .thumb-body(style="padding: 15px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1; justify-content: space-between;")
+              div
+                h3(style="margin: 0 0 5px 0; font-size: 1.1em; color: #2c3e50;")= post.titulo
+                p(style="margin: 0; font-size: 0.9em; color: #7f8c8d;")= post.descripcion ? (post.descripcion.length > 80 ? post.descripcion.substring(0, 80) + '...' : post.descripcion) : ''
+              
+              .actions-row(style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;")
+                a(href=`/posts-detail/${post.id_publicacion}` style="background-color: #34495e; color: white; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-size: 0.85em; font-weight: bold; text-align: center;") Ver detalles
+                form(action=`/collections/${collection.id_collection}/delete/${post.id_publicacion}` method="POST" style="margin: 0;")
+                  button(type="submit" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 0.85em; font-weight: bold; padding: 0;") Quitar
+    else
+      p(style="color: #7f8c8d; font-style: italic; text-align: center; margin-top: 50px;") Esta colección no tiene publicaciones guardadas aún.

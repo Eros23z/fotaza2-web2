@@ -3,6 +3,9 @@ extends layout
 block content
   h1 Crea tu cuenta en Fotaza 2
   
+  if error
+    div(style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #f5c6cb; font-weight: bold; text-align: center;") #{error}
+
   form(action="/register", method="POST")
       
       div

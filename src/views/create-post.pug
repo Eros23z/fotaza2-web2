@@ -3,28 +3,79 @@ extends layout
 block content
     h1 Nueva Publicación
 
-    form(action="/create-post", method="POST", enctype="multipart/form-data")
+    form(action="/create-post", method="POST", enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto;")
       
       div.form-group
         label(for="titulo") Título:
         input(type="text", name="titulo", id="titulo", required)
-      div.form-group
-        label(for="descripcion") Descripción:
-        input(type="text", name="descripcion", id="descripcion")
-      div.form-group
-        label(for="imagen") Seleccionar Imagen:
-        input(type="file", name="imagen", id="imagen", accept="image/png,image/jpeg,image/webp", required)
-      div.form-group.checkbox-group
-        input(type="checkbox", name="tiene_copyright", id="tiene_copyright", value="1")
-        label(for="tiene_copyright") Esta imagen tiene copyright
       
-      div.form-group.checkbox-group
+      div.form-group
+        label(for="descripcion") Descripción (Opcional):
+        textarea(name="descripcion" id="descripcion" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit;")
+
+      div#images-container
+        fieldset(style="border: 1px solid #ddd; padding: 15px; border-radius: 6px; margin-bottom: 20px; background-color: #fafafa;")
+          legend(style="font-weight: bold; padding: 0 10px; color: #2c3e50;") Imagen Principal
+          div.form-group
+            label(for="imagen-0") Archivo de Imagen:
+            input(type="file", name="imagen", id="imagen-0", accept="image/png,image/jpeg,image/webp", required)
+          div.form-group.checkbox-group(style="margin-top: 10px;")
+            input(type="checkbox", name="tiene_copyright_0", id="tiene_copyright_0", value="1" onchange="toggleWatermark(0)")
+            label(for="tiene_copyright_0") Esta imagen tiene copyright
+          div.form-group(id="watermark-group-0" style="display: none; margin-top: 10px;")
+            label(for="watermark_text_0") Texto de la Marca de Agua:
+            input(type="text", name="watermark_text_0", id="watermark_text_0", placeholder="Ej: Juan Pérez © 2026")
+
+      div(style="margin-bottom: 25px;")
+        button(type="button" onclick="addImageField()" style="background-color: #34495e; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer;") + Agregar otra imagen
+      
+      div.form-group.checkbox-group(style="margin-bottom: 20px;")
         input(type="checkbox", name="comentarios_cerrados", id="comentarios_cerrados", value="1")
         label(for="comentarios_cerrados") Cerrar comentarios para esta publicación
 
-      div
-        label(for="nombre_tag") Tags (separados por coma)
+      div.form-group(style="margin-bottom: 20px;")
+        label(for="nombre_tag") Tags (separados por coma):
         input(type="text", name="nombre_tag", id="nombre_tag", placeholder="ej: paisajes, vacaciones, nocturna")
 
       div
         button(type="submit") Publicar
+
+    script.
+      let imageIndex = 1;
+      function addImageField() {
+        const container = document.getElementById('images-container');
+        
+        const fieldset = document.createElement('fieldset');
+        fieldset.style.border = '1px solid #ddd';
+        fieldset.style.padding = '15px';
+        fieldset.style.borderRadius = '6px';
+        fieldset.style.marginBottom = '20px';
+        fieldset.style.backgroundColor = '#fafafa';
+        
+        fieldset.innerHTML = `
+          <legend style="font-weight: bold; padding: 0 10px; color: #2c3e50;">Imagen Adicional</legend>
+          <div class="form-group">
+            <label for="imagen-${imageIndex}">Archivo de Imagen:</label>
+            <input type="file" name="imagen" id="imagen-${imageIndex}" accept="image/png,image/jpeg,image/webp" required>
+          </div>
+          <div class="form-group checkbox-group" style="margin-top: 10px;">
+            <input type="checkbox" name="tiene_copyright_${imageIndex}" id="tiene_copyright_${imageIndex}" value="1" onchange="toggleWatermark(${imageIndex})">
+            <label for="tiene_copyright_${imageIndex}">Esta imagen tiene copyright</label>
+          </div>
+          <div class="form-group" id="watermark-group-${imageIndex}" style="display: none; margin-top: 10px;">
+            <label for="watermark_text_${imageIndex}">Texto de la Marca de Agua:</label>
+            <input type="text" name="watermark_text_${imageIndex}" id="watermark_text_${imageIndex}" placeholder="Ej: Juan Pérez © 2026">
+          </div>
+        `;
+        
+        container.appendChild(fieldset);
+        imageIndex++;
+      }
+      
+      function toggleWatermark(index) {
+        const checkbox = document.getElementById('tiene_copyright_' + index);
+        const group = document.getElementById('watermark-group-' + index);
+        if (checkbox && group) {
+          group.style.display = checkbox.checked ? 'block' : 'none';
+        }
+      }

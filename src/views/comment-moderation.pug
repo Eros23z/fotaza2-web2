@@ -1,0 +1,36 @@
+extends layout
+
+block content
+  h1 #{title || 'Moderación de Comentarios'}
+
+  .feed-container(style="max-width: 800px; margin: 20px auto;")
+    p(style="color: #7f8c8d; text-align: center; margin-bottom: 25px;") Aquí puedes ver y gestionar las denuncias realizadas sobre los comentarios en tus publicaciones.
+
+    if reports && reports.length > 0
+      each report in reports
+        article.post-card(style="border-color: #f5c6cb; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);")
+          .post-header(style="background-color: #fdf2f2; color: #721c24; display: flex; justify-content: space-between; padding: 12px 15px;")
+            h2(style="margin: 0; font-size: 1.1em;") Denuncia ##{report.id_denuncia} - Motivo: #{report.motivo}
+            span.username(style="font-size: 0.85em; color: #721c24;") Denunciado por: @#{report.username_denunciante}
+          
+          .post-body(style="padding: 15px; background-color: #fff;")
+            p(style="font-weight: bold; margin-bottom: 5px; font-size: 0.95em;") Comentario denunciado:
+            p(style="background-color: #f8f9fa; padding: 10px; border-radius: 4px; border: 1px solid #e9ecef; margin: 5px 0; font-style: italic; color: #333;")
+              | "#{report.texto_comentario}"
+            
+            p(style="font-weight: bold; margin-top: 15px; margin-bottom: 5px; font-size: 0.95em;") Explicación del denunciante:
+            p(style="margin-top: 0; color: #555; font-size: 0.9em; line-height: 1.4;") #{report.descripcion}
+            
+            p(style="font-size: 0.85em; color: #7f8c8d; margin-top: 15px;")
+              strong Publicación original: 
+              a(href=`/posts-detail/${report.id_publicacion}` target="_blank" style="color: #2980b9; text-decoration: none; font-weight: bold;") #{report.titulo_publicacion}
+
+          .post-footer(style="display: flex; gap: 10px; justify-content: flex-end; padding: 12px 15px; background-color: #f8f9fa; border-top: 1px solid #eee;")
+            form(action=`/profile/moderation/comments/${report.id_denuncia}/dismiss` method="POST" style="margin: 0;")
+              button(type="submit" style="background-color: #7f8c8d; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85em;") Desestimar
+            form(action=`/profile/moderation/comments/${report.id_denuncia}/delete` method="POST" style="margin: 0;")
+              button(type="submit" style="background-color: #c0392b; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85em;") Borrar comentario
+    else
+      .no-posts(style="text-align: center; padding: 40px; border: 1px dashed #ccc; border-radius: 8px; background-color: #fafafa;")
+        p(style="font-size: 1.1em; color: #7f8c8d; margin: 0;") No tienes denuncias de comentarios pendientes en este momento.
+        a.btn-detail(href="/" style="display: inline-block; margin-top: 15px; text-decoration: none;") Volver al Inicio

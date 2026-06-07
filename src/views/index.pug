@@ -3,6 +3,47 @@ extends layout
 block content
   h1 #{title}
 
+  div(style="background-color: #fafafa; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);")
+    h3(style="margin-top: 0; font-size: 1.1em; color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 8px;") Búsqueda Avanzada
+    form(action="/search" method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; align-items: end;")
+      div
+        label(for="search-keyword" style="font-size: 0.85em; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;") Palabra clave:
+        input(type="text" name="q" id="search-keyword" placeholder="Título, desc..." value=searchTerm style="padding: 6px; font-size: 0.9em; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;")
+      
+      div
+        label(for="search-licencia" style="font-size: 0.85em; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;") Licencia:
+        select(name="licencia" id="search-licencia" style="padding: 6px; font-size: 0.9em; width: 100%; border: 1px solid #ccc; border-radius: 4px; background: white;")
+          option(value="") -- Cualquiera --
+          option(value="copyright" selected=(filters && filters.licencia === 'copyright')) Copyright
+          option(value="public" selected=(filters && filters.licencia === 'public')) Dominio Público
+      
+      div
+        label(for="search-rating" style="font-size: 0.85em; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;") Calificación mín:
+        select(name="rating_min" id="search-rating" style="padding: 6px; font-size: 0.9em; width: 100%; border: 1px solid #ccc; border-radius: 4px; background: white;")
+          option(value="") -- Cualquiera --
+          option(value="1" selected=(filters && filters.rating_min === '1')) 1+ Estrella
+          option(value="2" selected=(filters && filters.rating_min === '2')) 2+ Estrellas
+          option(value="3" selected=(filters && filters.rating_min === '3')) 3+ Estrellas
+          option(value="4" selected=(filters && filters.rating_min === '4')) 4+ Estrellas
+          option(value="5" selected=(filters && filters.rating_min === '5')) 5 Estrellas
+      
+      div
+        label(for="search-fecha" style="font-size: 0.85em; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;") Fecha:
+        select(name="fecha" id="search-fecha" style="padding: 6px; font-size: 0.9em; width: 100%; border: 1px solid #ccc; border-radius: 4px; background: white;")
+          option(value="") -- Todas --
+          option(value="recientes" selected=(filters && filters.fecha === 'recientes')) Últimas 24 hs
+          option(value="semana" selected=(filters && filters.fecha === 'semana')) Última semana
+          option(value="mes" selected=(filters && filters.fecha === 'mes')) Último mes
+      
+      div
+        label(for="search-tag" style="font-size: 0.85em; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;") Tag específica:
+        input(type="text" name="tag" id="search-tag" placeholder="Ej: paisajes" value=(filters && filters.tag) style="padding: 6px; font-size: 0.9em; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;")
+
+      div
+        button(type="submit" style="background-color: #3498db; color: white; border: none; padding: 7px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; font-size: 0.9em; transition: background-color 0.2s; height: 34px;") Filtrar
+        if filters || searchTerm
+          a(href="/" style="display: block; text-align: center; font-size: 0.8em; margin-top: 5px; color: #e74c3c; text-decoration: none; font-weight: bold;") Limpiar filtros
+
   .feed-container
     if posts && posts.length > 0
       each post in posts
