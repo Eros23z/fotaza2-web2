@@ -5,7 +5,7 @@ const Notification = require('../models/NotificationModel');
 exports.addRating = async (req, res) => {
     try {
         const { id_publicacion } = req.params;
-        const { puntaje } = req.body;
+        const { puntaje, id_imagen } = req.body;
         const user = req.user.id;
         
         const post = await Post.getPostDetail(id_publicacion);
@@ -13,20 +13,20 @@ exports.addRating = async (req, res) => {
             return res.status(404).send('Publicación no encontrada');
         }
         
-        if (!post.id_imagen) {
-            return res.status(400).send('Esta publicación no tiene una imagen para valorar');
+        if (!id_imagen) {
+            return res.status(400).send('Debes especificar la imagen a valorar');
         }
         
         if (user === post.id_usuario) {
             return res.status(403).send('No puedes valorar tu propia publicación');
         }
         
-        const userRated = await Rate.userHasRated(user, post.id_imagen);
+        const userRated = await Rate.userHasRated(user, parseInt(id_imagen, 10));
         if (userRated) {
-            return res.status(403).send('Ya has valorado esta publicación');
+            return res.status(403).send('Ya has valorado esta imagen');
         }
         
-        await Rate.addRating(user, post.id_imagen, parseInt(puntaje, 10));
+        await Rate.addRating(user, parseInt(id_imagen, 10), parseInt(puntaje, 10));
         await Notification.createNotification(id_publicacion, post.id_usuario, user, 'valoracion', new Date());
         res.redirect(`/posts-detail/${id_publicacion}`);
     } catch (error) {

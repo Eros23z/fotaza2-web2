@@ -16,6 +16,18 @@ const Rate = {
         const query = `SELECT AVG(puntaje) as promedio FROM valoraciones_imagen WHERE id_imagen = $1`;
         const { rows } = await db.query(query, [id_imagen]);
         return rows[0];
+    },
+
+    getUserRatedImageIdsForPost: async (id_usuario, id_publicacion) => {
+        const query = `
+            SELECT id_imagen 
+            FROM valoraciones_imagen 
+            WHERE id_usuario = $1 AND id_imagen IN (
+                SELECT id_imagen FROM imagenes WHERE id_publicacion = $2
+            )
+        `;
+        const { rows } = await db.query(query, [id_usuario, id_publicacion]);
+        return rows.map(r => r.id_imagen);
     }
 };
 

@@ -3,12 +3,21 @@ const db = require('../config/db');
 const Post = {
     getAllWithImages: async () => {
         const query = `
-            SELECT p.*, i.imagen_url, u.username 
+            SELECT p.*, MAX(i.imagen_url) as imagen_url, u.username,
+                   AVG(v.puntaje) as promedio_rating,
+                   COUNT(v.puntaje) as total_votos
             FROM publicaciones p
             LEFT JOIN imagenes i ON p.id_publicacion = i.id_publicacion
             JOIN usuarios u ON p.id_usuario = u.id_usuario
+            LEFT JOIN valoraciones_imagen v ON i.id_imagen = v.id_imagen
             WHERE p.filtrada = false
-            ORDER BY p.fecha_publicacion DESC;
+            GROUP BY p.id_publicacion, u.username
+            ORDER BY 
+                CASE 
+                    WHEN COUNT(v.puntaje) >= 2 AND AVG(v.puntaje) >= 4.0 THEN 1
+                    ELSE 2
+                END ASC,
+                p.fecha_publicacion DESC;
         `;
         const { rows } = await db.query(query);
         return rows;
@@ -48,15 +57,27 @@ const Post = {
 
     getPostDetail: async (id_publicacion) => {
         const postQuery = `
-            SELECT p.*, i.id_imagen, i.imagen_url, u.username
+            SELECT p.*, u.username
             FROM publicaciones p
-            LEFT JOIN imagenes i ON p.id_publicacion = i.id_publicacion
             JOIN usuarios u ON p.id_usuario = u.id_usuario
             WHERE p.id_publicacion = $1 AND p.filtrada = false;
         `;
         const postResult = await db.query(postQuery, [id_publicacion]);
         const post = postResult.rows[0];
         if (!post) return null;
+
+        const imagesQuery = `
+            SELECT i.*, 
+                   AVG(v.puntaje) as promedio, 
+                   COUNT(v.puntaje) as total_votos
+            FROM imagenes i
+            LEFT JOIN valoraciones_imagen v ON i.id_imagen = v.id_imagen
+            WHERE i.id_publicacion = $1
+            GROUP BY i.id_imagen
+            ORDER BY i.id_imagen ASC;
+        `;
+        const imagesResult = await db.query(imagesQuery, [id_publicacion]);
+        post.imagenes = imagesResult.rows;
 
         const commentsQuery = `
             SELECT c.*, u.username as username_comentario
@@ -77,14 +98,6 @@ const Post = {
         const tagsResult = await db.query(tagsQuery, [id_publicacion]);
         post.etiquetas = tagsResult.rows;
 
-        const ratingQuery = `
-            SELECT AVG(v.puntaje) as promedio, COUNT(*) as total_votos
-            FROM valoraciones_imagen v
-            JOIN imagenes i ON v.id_imagen = i.id_imagen
-            WHERE i.id_publicacion = $1;
-        `;
-        const ratingResult = await db.query(ratingQuery, [id_publicacion]);
-        post.valoracion = ratingResult.rows[0];
         return post;
     },
 
@@ -101,6 +114,28 @@ const Post = {
             JOIN usuarios u ON p.id_usuario = u.id_usuario
             LEFT JOIN imagenes i ON p.id_publicacion = i.id_publicacion
             WHERE p.id_usuario = $1
+            ORDER BY p.fecha_publicacion DESC;
+        `;
+        const { rows } = await db.query(query, [id_usuario]);
+        return rows;
+    },
+
+    closeComments: async (id_publicacion) => {
+        const query = `UPDATE publicaciones SET comentarios_cerrados = true WHERE id_publicacion = $1`;
+        await db.query(query, [id_publicacion]);
+    },
+
+    getPostsFromFollowing: async (id_usuario) => {
+        const query = `
+            SELECT p.*, i.imagen_url, u.username
+            FROM publicaciones p
+            LEFT JOIN imagenes i ON p.id_publicacion = i.id_publicacion
+            JOIN usuarios u ON p.id_usuario = u.id_usuario
+            WHERE p.id_usuario IN (
+                SELECT id_seguido
+                FROM seguidores
+                WHERE id_seguidor = $1
+            ) AND p.filtrada = false
             ORDER BY p.fecha_publicacion DESC;
         `;
         const { rows } = await db.query(query, [id_usuario]);
@@ -125,21 +160,61 @@ const search = async (term) => {
     return rows;
 };
 
-const getPostFromFollowing = async (id_usuario) => {
-    const query = `
-        SELECT p.*, i.imagen_url, u.username
+const searchAdvanced = async (filters) => {
+    const { keyword, licencia, rating_min, fecha, tag } = filters;
+    let query = `
+        SELECT p.*, MAX(i.imagen_url) as imagen_url, u.username,
+               AVG(v.puntaje) as promedio_rating
         FROM publicaciones p
         LEFT JOIN imagenes i ON p.id_publicacion = i.id_publicacion
         JOIN usuarios u ON p.id_usuario = u.id_usuario
-        WHERE p.id_usuario IN (
-            SELECT id_usuario_seguido
-            FROM seguidores
-            WHERE id_usuario = $1
-        )
-        ORDER BY p.fecha_publicacion DESC;
+        LEFT JOIN publicacion_etiqueta pe ON p.id_publicacion = pe.id_publicacion
+        LEFT JOIN etiquetas t ON pe.id_tag = t.id_tag
+        LEFT JOIN valoraciones_imagen v ON i.id_imagen = v.id_imagen
+        WHERE p.filtrada = false
     `;
-    const { rows } = await db.query(query, [id_usuario]);
+    
+    const params = [];
+    let paramIndex = 1;
+
+    if (keyword) {
+        params.push(`%${keyword}%`);
+        query += ` AND (p.titulo ILIKE $${paramIndex} OR p.descripcion ILIKE $${paramIndex} OR t.nombre_tag ILIKE $${paramIndex})`;
+        paramIndex++;
+    }
+
+    if (licencia === 'copyright') {
+        query += ` AND i.tiene_copyright = true`;
+    } else if (licencia === 'public') {
+        query += ` AND (i.tiene_copyright = false OR i.tiene_copyright IS NULL)`;
+    }
+
+    if (tag) {
+        params.push(tag);
+        query += ` AND t.nombre_tag = $${paramIndex}`;
+        paramIndex++;
+    }
+
+    if (fecha === 'recientes') {
+        query += ` AND p.fecha_publicacion >= NOW() - INTERVAL '1 day'`;
+    } else if (fecha === 'semana') {
+        query += ` AND p.fecha_publicacion >= NOW() - INTERVAL '7 days'`;
+    } else if (fecha === 'mes') {
+        query += ` AND p.fecha_publicacion >= NOW() - INTERVAL '30 days'`;
+    }
+
+    query += ` GROUP BY p.id_publicacion, u.username`;
+
+    if (rating_min) {
+        params.push(parseFloat(rating_min));
+        query += ` HAVING AVG(v.puntaje) >= $${paramIndex}`;
+        paramIndex++;
+    }
+
+    query += ` ORDER BY p.fecha_publicacion DESC;`;
+
+    const { rows } = await db.query(query, params);
     return rows;
 };
 
-module.exports = { Post, search, getPostFromFollowing };
+module.exports = { Post, search, searchAdvanced };
