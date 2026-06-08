@@ -4,62 +4,92 @@ html(lang="es")
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     title= title || "Fotaza 2"
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css")
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css")
     link(rel="stylesheet", href="/css/style.css")
-  body
+  body.bg-light.d-flex.flex-column.min-vh-100
     header
-      nav
-        div.nav-links
-          a(href="/") Inicio
-          if user
-            a(href="/create-post") Nueva Publicación
-            a(href="/messages") Mensajes
-            a(href="/my-collections") Mis Colecciones
-            a(href="/profile/moderation/comments") Moderar Comentarios
-            if user.rol === 'validador'
-              a(href="/admin/reports") Moderación
+      nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.shadow-sm
+        div.container
+          a.navbar-brand.fw-bold(href="/")
+            i.bi.bi-camera-fill.me-2
+            | Fotaza 2
+          button.navbar-toggler(type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation")
+            span.navbar-toggler-icon
+          
+          div#navbarNav.collapse.collapse.navbar-collapse
+            ul.navbar-nav.me-auto.mb-2.mb-lg-0
+              li.nav-item
+                a.nav-link(href="/") Inicio
+              if user
+                li.nav-item
+                  a.nav-link(href="/create-post") Nueva Publicación
+                li.nav-item
+                  a.nav-link(href="/messages") Mensajes
+                li.nav-item
+                  a.nav-link(href="/my-collections") Colecciones
+                li.nav-item
+                  a.nav-link(href="/profile/moderation/comments") Moderar Comentarios
+                if user.rol === 'validador'
+                  li.nav-item
+                    a.nav-link.text-warning(href="/admin/reports") Panel Moderación
             
-            div.notification-dropdown
-              details
-                summary.bell-icon #{notifications && notifications.filter(n => !n.leida).length > 0 ? `(${notifications.filter(n => !n.leida).length})` : ''}
-                div.dropdown-content
-                  if notifications && notifications.length > 0
-                    each n in notifications
-                      if n.tipo_evento === 'nuevo_seguidor'
-                        div.notif-item
-                          span @#{n.username} comenzó a seguirte.
-                      else if n.tipo_evento === 'comentario'
-                        a.notif-item(href=`/posts-detail/${n.id_publicacion}`)
-                          span @#{n.username} comentó tu publicación.
-                      else if n.tipo_evento === 'valoracion'
-                        a.notif-item(href=`/posts-detail/${n.id_publicacion}`)
-                          span @#{n.username} valoró tu imagen.
-                      else if n.tipo_evento === 'me_interesa'
-                        a.notif-item(href=`/posts-detail/${n.id_publicacion}`)
-                          span @#{n.username} tiene interés en tu post.
-                      else if n.tipo_evento === 'guardada'
-                        a.notif-item(href=`/posts-detail/${n.id_publicacion}`)
-                          span @#{n.username} guardó tu publicación en su colección.
-                    div.dropdown-footer
-                      a(href="/notifications") Ver todas
-                  else
-                    div.notif-item.empty No tienes notificaciones.
+            form.d-flex.me-3(action="/search" method="GET" role="search")
+              input.form-control.form-control-sm.me-2(type="search" name="q" placeholder="Buscar..." aria-label="Buscar" value=searchTerm)
+              button.btn.btn-outline-light.btn-sm(type="submit") Buscar
             
-            a(href="/logout") Salir
-          else
-            a(href="/login") Entrar
-            a(href="/register") Registrarse
-        
-        div.nav-search
-          form(action="/search" method="GET")
-            input(type="text" name="q" placeholder="Buscar fotos o tags..." value=searchTerm)
-            button(type="submit") Buscar
-
-      if user
-        div.user-info
-          span Conectado como: #{user.username}
+            ul.navbar-nav
+              if user
+                li.nav-item.dropdown.me-3
+                  a#notifDropdown.nav-link.position-relative(href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false")
+                    i.bi.bi-bell-fill.fs-5
+                    if notifications && notifications.filter(n => !n.leida).length > 0
+                      span.position-absolute.top-0.start-100.translate-middle.badge.rounded-pill.bg-danger.small(style="font-size: 0.6em;")
+                        | #{notifications.filter(n => !n.leida).length}
+                  ul.dropdown-menu.dropdown-menu-end.shadow(aria-labelledby="notifDropdown" style="width: 290px; max-height: 350px; overflow-y: auto;")
+                    if notifications && notifications.length > 0
+                      each n in notifications
+                        li
+                          if n.tipo_evento === 'nuevo_seguidor'
+                            span.dropdown-item-text.small.text-wrap @#{n.username} comenzó a seguirte.
+                          else if n.tipo_evento === 'comentario'
+                            a.dropdown-item.small.text-wrap(href=`/posts-detail/${n.id_publicacion}`) @#{n.username} comentó tu publicación.
+                          else if n.tipo_evento === 'valoracion'
+                            a.dropdown-item.small.text-wrap(href=`/posts-detail/${n.id_publicacion}`) @#{n.username} valoró tu imagen.
+                          else if n.tipo_evento === 'me_interesa'
+                            a.dropdown-item.small.text-wrap(href=`/posts-detail/${n.id_publicacion}`) @#{n.username} tiene interés en tu post.
+                          else if n.tipo_evento === 'guardada'
+                            a.dropdown-item.small.text-wrap(href=`/posts-detail/${n.id_publicacion}`) @#{n.username} guardó tu publicación.
+                      li
+                        hr.dropdown-divider
+                      li
+                        a.dropdown-item.text-center.small.text-primary.fw-bold(href="/notifications") Ver todas
+                    else
+                      li
+                        span.dropdown-item-text.small.text-muted.text-center No tienes notificaciones
+                
+                li.nav-item.dropdown
+                  a#userDropdown.nav-link.dropdown-toggle.fw-bold(href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false")
+                    i.bi.bi-person-circle.me-1
+                    | #{user.username}
+                  ul.dropdown-menu.dropdown-menu-end.shadow(aria-labelledby="userDropdown")
+                    li
+                      a.dropdown-item(href=`/profile/${user.id}`) Mi Perfil
+                    li
+                      hr.dropdown-divider
+                    li
+                      a.dropdown-item.text-danger(href="/logout") Salir
+              else
+                li.nav-item
+                  a.btn.btn-outline-light.btn-sm.me-2(href="/login") Entrar
+                li.nav-item
+                  a.btn.btn-primary.btn-sm(href="/register") Registrarse
     
-    main
+    main.container.my-5.flex-grow-1
       block content 
 
-    footer
-      p &copy; 2026 Fotaza 2 - Programación Web II
+    footer.bg-dark.text-white-50.text-center.py-3.mt-auto.border-top.border-secondary
+      div.container
+        p.mb-0.small &copy; 2026 Fotaza 2 - Programación Web II
+    
+    script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js")
