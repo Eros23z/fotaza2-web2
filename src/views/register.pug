@@ -1,35 +1,42 @@
 extends layout
 
 block content
-  h1 Crea tu cuenta en Fotaza 2
-  
-  if error
-    div(style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #f5c6cb; font-weight: bold; text-align: center;") #{error}
+  div.row
+    div.col-md-8.col-lg-6.mx-auto
+      div.card.shadow-sm.border-0.mt-4
+        div.card-body.p-4
+          h2.card-title.text-center.mb-4.fw-bold Crear Cuenta
+          
+          if error
+            div.alert.alert-danger.text-center.py-2.small #{error}
 
-  form(action="/register", method="POST")
-      
-      div
-        label(for="nombre") Nombre:
-        input(type="text", name="nombre", id="nombre", required)
+          form(action="/register" method="POST")
+            div.row.g-3.mb-3
+              div.col-sm-6
+                label.form-label.small.fw-bold(for="nombre") Nombre:
+                input.form-control(type="text" name="nombre" id="nombre" required)
+              div.col-sm-6
+                label.form-label.small.fw-bold(for="apellido") Apellido:
+                input.form-control(type="text" name="apellido" id="apellido" required)
+            
+            div.mb-3
+              label.form-label.small.fw-bold(for="username") Nombre de usuario:
+              input.form-control(type="text" name="username" id="username" required)
+            
+            div.mb-3
+              label.form-label.small.fw-bold(for="email") Correo Electrónico:
+              input.form-control(type="email" name="email" id="email" required)
+            
+            div.mb-3
+              label.form-label.small.fw-bold(for="password") Contraseña:
+              input.form-control(type="password" name="password" id="password" required)
+            
+            div.mb-3
+              label.form-label.small.fw-bold(for="fecha_nacimiento") Fecha de nacimiento:
+              input.form-control(type="date" name="fecha_nacimiento" id="fecha_nacimiento" required)
 
-      div
-        label(for="apellido") Apellido:
-        input(type="text", name="apellido", id="apellido", required)
-      div
-        label(for="username") Nombre de usuario:
-        input(type="text", name="username", id="username", required)
-      div
-        label(for="email") Email:
-        input(type="email", name="email", id="email", required)
-      div
-        label(for="password") Contraseña:
-        input(type="password", name="password", id="password", required)
-      div
-        label(for="fecha_nacimiento") Fecha de nacimiento:
-        input(type="date", name="fecha_nacimiento", id="fecha_nacimiento", required)
-
-      div
-        button(type="submit") Registrarme
-
-  p ¿Ya tienes cuenta? 
-    a(href="/login") Inicia sesión aquí
+            button.btn.btn-primary.w-100.mt-3.fw-bold(type="submit") Registrarse
+          
+          div.text-center.mt-4.small
+            span ¿Ya tienes una cuenta? 
+            a.text-decoration-none(href="/login") Inicia sesión aquí

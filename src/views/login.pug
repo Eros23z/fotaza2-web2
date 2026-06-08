@@ -1,25 +1,30 @@
 extends layout
 
 block content
-    h1 Inicia sesion en Fotaza 2
+  div.row
+    div.col-md-6.col-lg-5.mx-auto
+      div.card.shadow-sm.border-0.mt-4
+        div.card-body.p-4
+          h2.card-title.text-center.mb-4.fw-bold Iniciar Sesión
+          
+          if error
+            div.alert.alert-danger.text-center.py-2.small #{error}
 
-    if error
-      div(style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #f5c6cb; font-weight: bold; text-align: center;") #{error}
+          form(action="/login" method="POST")
+            div.mb-3
+              label.form-label.small.fw-bold(for="username") Nombre de usuario:
+              input.form-control(type="text" name="username" id="username" required)
+            
+            div.mb-3
+              label.form-label.small.fw-bold(for="email") Correo Electrónico:
+              input.form-control(type="email" name="email" id="email" required)
+            
+            div.mb-3
+              label.form-label.small.fw-bold(for="password") Contraseña:
+              input.form-control(type="password" name="password" id="password" required)
 
-    form(action="/login", method="POST")
-      
-      div
-        label(for="username") Nombre de usuario:
-        input(type="text", name="username", id="username", required)
-      div
-        label(for="email") Email:
-        input(type="email", name="email", id="email", required)
-      div
-        label(for="password") Contraseña:
-        input(type="password", name="password", id="password", required)
-
-      div
-        button(type="submit") Iniciar sesion
-    
-    p ¿No tienes cuenta? 
-    a(href="/register") Registrarse aqui
+            button.btn.btn-primary.w-100.mt-3.fw-bold(type="submit") Entrar
+          
+          div.text-center.mt-4.small
+            span ¿No tienes una cuenta? 
+            a.text-decoration-none(href="/register") Regístrate aquí
