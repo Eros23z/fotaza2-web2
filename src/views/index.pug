@@ -1,68 +1,74 @@
 extends layout
 
 block content
-  h1 #{title}
+  h2.mb-4.fw-bold #{title || 'Descubre Fotos'}
 
-  div(style="background-color: #fafafa; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);")
-    h3(style="margin-top: 0; font-size: 1.1em; color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 8px;") Búsqueda Avanzada
-    form(action="/search" method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; align-items: end;")
-      div
-        label(for="search-keyword" style="font-size: 0.85em; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;") Palabra clave:
-        input(type="text" name="q" id="search-keyword" placeholder="Título, desc..." value=searchTerm style="padding: 6px; font-size: 0.9em; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;")
+  div.card.border-0.shadow-sm.mb-4
+    div.card-body.p-4
+      h5.card-title.fw-bold.mb-3
+        i.bi.bi-sliders.me-2
+        | Búsqueda Avanzada
       
-      div
-        label(for="search-licencia" style="font-size: 0.85em; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;") Licencia:
-        select(name="licencia" id="search-licencia" style="padding: 6px; font-size: 0.9em; width: 100%; border: 1px solid #ccc; border-radius: 4px; background: white;")
-          option(value="") -- Cualquiera --
-          option(value="copyright" selected=(filters && filters.licencia === 'copyright')) Copyright
-          option(value="public" selected=(filters && filters.licencia === 'public')) Dominio Público
-      
-      div
-        label(for="search-rating" style="font-size: 0.85em; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;") Calificación mín:
-        select(name="rating_min" id="search-rating" style="padding: 6px; font-size: 0.9em; width: 100%; border: 1px solid #ccc; border-radius: 4px; background: white;")
-          option(value="") -- Cualquiera --
-          option(value="1" selected=(filters && filters.rating_min === '1')) 1+ Estrella
-          option(value="2" selected=(filters && filters.rating_min === '2')) 2+ Estrellas
-          option(value="3" selected=(filters && filters.rating_min === '3')) 3+ Estrellas
-          option(value="4" selected=(filters && filters.rating_min === '4')) 4+ Estrellas
-          option(value="5" selected=(filters && filters.rating_min === '5')) 5 Estrellas
-      
-      div
-        label(for="search-fecha" style="font-size: 0.85em; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;") Fecha:
-        select(name="fecha" id="search-fecha" style="padding: 6px; font-size: 0.9em; width: 100%; border: 1px solid #ccc; border-radius: 4px; background: white;")
-          option(value="") -- Todas --
-          option(value="recientes" selected=(filters && filters.fecha === 'recientes')) Últimas 24 hs
-          option(value="semana" selected=(filters && filters.fecha === 'semana')) Última semana
-          option(value="mes" selected=(filters && filters.fecha === 'mes')) Último mes
-      
-      div
-        label(for="search-tag" style="font-size: 0.85em; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;") Tag específica:
-        input(type="text" name="tag" id="search-tag" placeholder="Ej: paisajes" value=(filters && filters.tag) style="padding: 6px; font-size: 0.9em; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;")
+      form(action="/search" method="GET")
+        div.row.g-3.align-items-end
+          div.col-md-4
+            label.form-label.small.fw-bold.text-muted(for="search-keyword") Palabra clave:
+            input.form-control.form-control-sm(type="text" name="q" id="search-keyword" placeholder="Título, descripción..." value=searchTerm)
+          
+          div.col-md-2
+            label.form-label.small.fw-bold.text-muted(for="search-licencia") Licencia:
+            select.form-select.form-select-sm(name="licencia" id="search-licencia")
+              option(value="") Cualquiera
+              option(value="copyright" selected=(filters && filters.licencia === 'copyright')) Copyright
+              option(value="public" selected=(filters && filters.licencia === 'public')) Dominio Público
+          
+          div.col-md-2
+            label.form-label.small.fw-bold.text-muted(for="search-rating") Calificación mín:
+            select.form-select.form-select-sm(name="rating_min" id="search-rating")
+              option(value="") Cualquiera
+              option(value="1" selected=(filters && filters.rating_min === '1')) 1+ Estrella
+              option(value="2" selected=(filters && filters.rating_min === '2')) 2+ Estrellas
+              option(value="3" selected=(filters && filters.rating_min === '3')) 3+ Estrellas
+              option(value="4" selected=(filters && filters.rating_min === '4')) 4+ Estrellas
+              option(value="5" selected=(filters && filters.rating_min === '5')) 5 Estrellas
+          
+          div.col-md-2
+            label.form-label.small.fw-bold.text-muted(for="search-fecha") Fecha:
+            select.form-select.form-select-sm(name="fecha" id="search-fecha")
+              option(value="") Todas
+              option(value="recientes" selected=(filters && filters.fecha === 'recientes')) Últimas 24 hs
+              option(value="semana" selected=(filters && filters.fecha === 'semana')) Última semana
+              option(value="mes" selected=(filters && filters.fecha === 'mes')) Último mes
+          
+          div.col-md-2
+            label.form-label.small.fw-bold.text-muted(for="search-tag") Tag específica:
+            input.form-control.form-control-sm(type="text" name="tag" id="search-tag" placeholder="Ej: paisajes" value=(filters && filters.tag))
+          
+          div.col-12.d-flex.justify-content-end.gap-2.mt-3
+            if filters || searchTerm
+              a.btn.btn-outline-danger.btn-sm.fw-bold(href="/") Limpiar filtros
+            button.btn.btn-primary.btn-sm.fw-bold.px-4(type="submit")
+              i.bi.bi-search.me-1
+              | Filtrar
 
-      div
-        button(type="submit" style="background-color: #3498db; color: white; border: none; padding: 7px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; font-size: 0.9em; transition: background-color 0.2s; height: 34px;") Filtrar
-        if filters || searchTerm
-          a(href="/" style="display: block; text-align: center; font-size: 0.8em; margin-top: 5px; color: #e74c3c; text-decoration: none; font-weight: bold;") Limpiar filtros
-
-  .feed-container
-    if posts && posts.length > 0
+  if posts && posts.length > 0
+    div.row.row-cols-1.row-cols-md-2.row-cols-lg-3.g-4
       each post in posts
-        article.post-card
-          .post-header
-            h2= post.titulo
-            a(href=`/profile/${post.id_usuario}`)
-              span.username Por: #{post.username}
-          
-          .post-image
-            img(src=post.imagen_url, alt=post.titulo)
-          
-          .post-body
-            p= post.descripcion
-          
-          .post-footer
-            a.btn-detail(href=`/posts-detail/${post.id_publicacion}`) Ver detalles
-    else
-      .no-posts
-        p No se encontraron publicaciones.
-        if searchTerm
-          a(href="/") Ver todas las publicaciones
+        div.col
+          div.card.h-100.shadow-sm.border-0
+            img.card-img-top(src=post.imagen_url alt=post.titulo style="height: 220px; object-fit: cover;")
+            div.card-body.d-flex.flex-column
+              h5.card-title.fw-bold= post.titulo
+              p.card-text.text-muted.small.flex-grow-1= post.descripcion
+              div.d-flex.justify-content-between.align-items-center.mt-3
+                a.small.text-decoration-none.text-secondary(href=`/profile/${post.id_usuario}`)
+                  i.bi.bi-person-circle.me-1
+                  | @#{post.username}
+                a.btn.btn-outline-primary.btn-sm.fw-bold(href=`/posts-detail/${post.id_publicacion}`)
+                  | Ver detalles
+  else
+    div.text-center.py-5
+      i.bi.bi-image.text-muted.fs-1
+      p.text-muted.mt-2 No se encontraron publicaciones.
+      if searchTerm
+        a.btn.btn-primary.btn-sm.mt-2.fw-bold(href="/") Ver todas las publicaciones
