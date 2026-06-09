@@ -1,22 +1,34 @@
 extends layout
 
 block content
-  .chat-layout(style="max-width: 600px; margin: 20px auto;")
-    .chat-header(style="background-color: #2c3e50; color: white; padding: 15px; border-radius: 6px 6px 0 0; display: flex; justify-content: space-between; align-items: center;")
-      h2(style="margin: 0; font-size: 1.2em;") @#{contactUser.username}
-      a(href="/messages" style="color: #bdc3c7; text-decoration: none; font-size: 0.9em;") &larr; Volver
-      
-    .chat-messages(style="border: 1px solid #ddd; border-top: none; height: 350px; overflow-y: auto; padding: 20px; background-color: #fcfcfc; display: flex; flex-direction: column; gap: 12px;")
-      if conversation && conversation.length > 0
-        each msg in conversation
-          - const isMe = msg.id_usuario_envia === currentUser
-          div(style=`max-width: 75%; padding: 10px 14px; border-radius: 8px; font-size: 0.95em; line-height: 1.4em; word-wrap: break-word; ${isMe ? 'align-self: flex-end; background-color: #dcf8c6; border: 1px solid #c7eafc;' : 'align-self: flex-start; background-color: white; border: 1px solid #e0e0e0;'}`)
-            p(style="margin: 0;") #{msg.texto_mensaje}
-            span(style="display: block; font-size: 0.75em; color: #7f8c8d; text-align: right; margin-top: 4px;") #{new Date(msg.fecha_mensaje).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-      else
-        p.empty-chat(style="text-align: center; color: #7f8c8d; font-style: italic; margin: auto;") No hay mensajes en este chat. ¡Comienza a escribir!
+  div.row
+    div.col-md-8.col-lg-6.mx-auto
+      div.card.shadow-sm.border-0
+        div.card-header.bg-dark.text-white.d-flex.justify-content-between.align-items-center.py-3
+          h5.mb-0.fw-bold
+            i.bi.bi-chat-left-dots.me-2
+            | @#{contactUser.username}
+          a.btn.btn-outline-light.btn-sm.fw-bold(href="/messages")
+            i.bi.bi-arrow-left.me-1
+            | Volver
         
-    .chat-footer(style="border: 1px solid #ddd; border-top: none; border-radius: 0 0 6px 6px; background-color: #f1f1f1; padding: 10px;")
-      form(action=`/messages/${contactUser.id_usuario}/send` method="POST" style="display: flex; gap: 10px;")
-        textarea(name="texto_mensaje" placeholder="Escribe un mensaje..." required style="flex-grow: 1; height: 40px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: none; font-family: inherit;")
-        button(type="submit" style="background-color: #27ae60; color: white; border: none; padding: 0 20px; border-radius: 4px; font-weight: bold; cursor: pointer;") Enviar
+        div.card-body.bg-light.d-flex.flex-column.gap-2.overflow-auto(style="height: 380px;")
+          if conversation && conversation.length > 0
+            each msg in conversation
+              - const isMe = msg.id_usuario_envia === currentUser
+              div.d-flex.flex-column(class=isMe ? "align-self-end" : "align-self-start" style="max-width: 75%;")
+                div.p-2.rounded-3.shadow-sm.small(class=isMe ? "bg-primary text-white" : "bg-white border text-dark")
+                  p.mb-0.text-break= msg.texto_mensaje
+                span.text-muted.mt-1(style="font-size: 0.7em;" class=isMe ? "align-self-end" : "align-self-start")
+                  | #{new Date(msg.fecha_mensaje).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+          else
+            div.my-auto.text-center.text-muted.fst-italic.small
+              | No hay mensajes en este chat. ¡Comienza a escribir!
+        
+        div.card-footer.bg-white.p-3
+          form(action=`/messages/${contactUser.id_usuario}/send` method="POST")
+            div.input-group
+              input.form-control(name="texto_mensaje" placeholder="Escribe un mensaje..." required autocomplete="off")
+              button.btn.btn-success.fw-bold(type="submit")
+                i.bi.bi-send.me-1
+                | Enviar

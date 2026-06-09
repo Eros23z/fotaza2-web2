@@ -1,18 +1,25 @@
 extends layout
 
 block content
-  h1 #{title || 'Bandeja de Entrada'}
+  div.row
+    div.col-md-8.col-lg-6.mx-auto
+      h2.fw-bold.mb-4
+        i.bi.bi-chat-left-dots.me-2.text-primary
+        | #{title || 'Bandeja de Entrada'}
 
-  .messages-container(style="max-width: 600px; margin: 20px auto;")
-    if messages && messages.length > 0
-      ul.inbox-list(style="list-style: none; padding: 0;")
-        each contact in messages
-          li.inbox-item(style="border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 10px; background-color: white; display: flex; justify-content: space-between; align-items: center;")
-            .contact-info
-              span(style="font-size: 1.1em; font-weight: bold; color: #2c3e50;") Chat con @#{contact.username}
-            a.btn-detail(href=`/messages/${contact.id_usuario}`) Abrir chat
-    else
-      .no-conversations(style="text-align: center; padding: 40px; border: 1px dashed #ccc; background-color: #fafafa; border-radius: 6px;")
-        p(style="color: #7f8c8d; font-size: 1.1em;") No tienes conversaciones activas aún.
-        p(style="font-size: 0.9em; color: #95a5a6; margin-top: 5px;") Puedes iniciar una usando el botón "Me interesa" en las publicaciones de otros usuarios.
-        a.btn-detail(href="/" style="display: inline-block; margin-top: 15px;") Explorar fotos
+      if messages && messages.length > 0
+        div.list-group.shadow-sm.border-0.mb-4
+          each contact in messages
+            div.list-group-item.list-group-item-action.d-flex.justify-content-between.align-items-center.p-3
+              div
+                span.fw-bold.text-dark
+                  i.bi.bi-person-circle.me-2.text-secondary
+                  | Chat con @#{contact.username}
+              a.btn.btn-primary.btn-sm.fw-bold(href=`/messages/${contact.id_usuario}`)
+                | Abrir chat
+      else
+        div.text-center.py-5.bg-white.rounded.shadow-sm.p-4
+          i.bi.bi-chat-square-text.fs-1.text-muted
+          p.text-muted.mt-2.fw-bold No tienes conversaciones activas aún.
+          p.text-muted.small.mb-4 Puedes iniciar una usando el botón "Me interesa" en las publicaciones de otros usuarios.
+          a.btn.btn-primary.btn-sm.fw-bold(href="/") Explorar fotos

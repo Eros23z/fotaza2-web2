@@ -1,58 +1,77 @@
 extends layout
 
 block content
-  .profile-container
-    if userProfile
-      header.profile-header
-        .profile-info
-          h1 @#{userProfile.username}
-          p.full-name #{userProfile.nombre} #{userProfile.apellido}
-          p.email Correo: #{userProfile.email}
-          if userProfile.fecha_registro
-            p.joined Miembro desde: #{new Date(userProfile.fecha_registro).toLocaleDateString()}
+  div.row
+    div.col-lg-10.mx-auto
+      if userProfile
+        div.card.shadow-sm.border-0.mb-4
+          div.card-body.p-4
+            div.row.align-items-center.g-4
+              div.col-md-7
+                h2.fw-bold.mb-1
+                  i.bi.bi-person-circle.me-2.text-primary
+                  | @#{userProfile.username}
+                p.text-muted.mb-2.fw-bold #{userProfile.nombre} #{userProfile.apellido}
+                p.text-muted.small.mb-2
+                  i.bi.bi-envelope.me-1
+                  | Correo: #{userProfile.email}
+                if userProfile.fecha_registro
+                  p.text-muted.small.mb-0
+                    i.bi.bi-calendar-event.me-1
+                    | Miembro desde: #{new Date(userProfile.fecha_registro).toLocaleDateString()}
+              
+              div.col-md-5.d-flex.flex-column.align-items-md-end
+                div.d-flex.gap-4.mb-3
+                  div.text-center
+                    span.d-block.fs-4.fw-bold.text-dark #{followersCount || 0}
+                    span.text-muted.small.text-uppercase.fw-bold(style="font-size: 0.75em;") Seguidores
+                  div.text-center
+                    span.d-block.fs-4.fw-bold.text-dark #{followingCount || 0}
+                    span.text-muted.small.text-uppercase.fw-bold(style="font-size: 0.75em;") Siguiendo
+                  div.text-center
+                    span.d-block.fs-4.fw-bold.text-dark #{userPosts ? userPosts.length : 0}
+                    span.text-muted.small.text-uppercase.fw-bold(style="font-size: 0.75em;") Posts
+                
+                div.profile-actions
+                  if isOwnProfile
+                    span.badge.bg-info.text-dark.p-2.fw-bold
+                      i.bi.bi-shield-check.me-1
+                      | Este es tu perfil
+                  else
+                    if isFollowing
+                      form(action=`/users/${userProfile.id_usuario}/unfollow` method="POST" class="m-0")
+                        button.btn.btn-outline-danger.btn-sm.fw-bold(type="submit")
+                          i.bi.bi-person-x.me-1
+                          | Dejar de seguir
+                    else
+                      form(action=`/users/${userProfile.id_usuario}/follow` method="POST" class="m-0")
+                        button.btn.btn-primary.btn-sm.fw-bold(type="submit")
+                          i.bi.bi-person-plus.me-1
+                          | Seguir al usuario
+
+        h4.fw-bold.mb-4.mt-5
+          i.bi.bi-grid-3x3.me-2
+          | Publicaciones de @#{userProfile.username}
         
-        .profile-stats
-          .stat-item
-            span.stat-number #{followersCount || 0}
-            span.stat-label Seguidores
-          .stat-item
-            span.stat-number #{followingCount || 0}
-            span.stat-label Siguiendo
-          .stat-item
-            span.stat-number #{userPosts ? userPosts.length : 0}
-            span.stat-label Publicaciones
-
-        .profile-actions
-          if isOwnProfile
-            span.badge-own (Este es tu perfil de usuario)
-          else
-            if isFollowing
-              form(action=`/users/${userProfile.id_usuario}/unfollow` method="POST")
-                button(type="submit" class="btn-unfollow") Dejar de seguir
-            else
-              form(action=`/users/${userProfile.id_usuario}/follow` method="POST")
-                button(type="submit" class="btn-follow") Seguir al usuario
-
-      hr
-
-      section.profile-posts
-        h2 Publicaciones de @#{userProfile.username}
         if userPosts && userPosts.length > 0
-          .posts-grid
+          div.row.row-cols-1.row-cols-md-2.row-cols-lg-3.g-4
             each post in userPosts
-              article.post-thumb-card
-                if post.imagen_url
-                  .thumb-image
-                    img(src=post.imagen_url, alt=post.titulo)
-                .thumb-body
-                  h3= post.titulo
-                  p= post.descripcion ? post.descripcion.substring(0, 100) + '...' : ''
-                  a(href=`/posts-detail/${post.id_publicacion}` class="btn-view-more") Ver detalles
+              div.col
+                div.card.h-100.shadow-sm.border-0
+                  if post.imagen_url
+                    img.card-img-top(src=post.imagen_url alt=post.titulo style="height: 180px; object-fit: cover;")
+                  div.card-body.d-flex.flex-column
+                    h6.card-title.fw-bold= post.titulo
+                    p.card-text.text-muted.small.flex-grow-1= post.descripcion ? post.descripcion.substring(0, 70) + '...' : ''
+                    a.btn.btn-outline-primary.btn-sm.fw-bold.w-100.mt-2(href=`/posts-detail/${post.id_publicacion}`)
+                      | Ver detalles
         else
-          p.no-posts-msg Este usuario no tiene publicaciones creadas aún.
+          div.text-center.py-5.bg-white.rounded.shadow-sm
+            i.bi.bi-camera.fs-1.text-muted
+            p.text-muted.mt-2.small Este usuario no tiene publicaciones creadas aún.
 
-    else
-      .no-profile
-        h1 Usuario no encontrado
-        p El perfil que intentas visualizar no existe.
-        a(href="/") Volver al inicio
+      else
+        div.text-center.py-5
+          h2 Usuario no encontrado
+          p.text-muted El perfil que intentas visualizar no existe.
+          a.btn.btn-primary.btn-sm(href="/") Volver al inicio
