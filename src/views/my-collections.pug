@@ -1,26 +1,41 @@
 extends layout
 
 block content
-  .collections-container(style="max-width: 800px; margin: 0 auto; padding: 20px;")
-    h1(style="margin-bottom: 20px; color: #2c3e50;") Mis Colecciones
+  div.row
+    div.col-lg-10.mx-auto
+      h2.fw-bold.mb-4
+        i.bi.bi-folder2-open.me-2.text-primary
+        | Mis Colecciones
 
-    .create-collection-card(style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);")
-      h2(style="margin-top: 0; font-size: 1.2em; color: #34495e; margin-bottom: 15px;") Crear Nueva Colección
-      form(action="/collections" method="POST" style="display: flex; gap: 10px; align-items: center;")
-        input(type="text" name="nombre_collection" placeholder="Ej: Mis Favoritos, Paisajes..." required style="flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em;")
-        button(type="submit" style="background-color: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1em;") Crear Carpeta
+      div.card.border-0.shadow-sm.mb-4
+        div.card-body.p-4
+          h5.card-title.fw-bold.mb-3 Crear Nueva Colección
+          form(action="/collections" method="POST")
+            div.row.g-2.align-items-center
+              div.col-md-9
+                input.form-control(type="text" name="nombre_collection" placeholder="Ej: Mis Favoritos, Paisajes, Inspiración..." required)
+              div.col-md-3
+                button.btn.btn-success.w-100.fw-bold(type="submit")
+                  i.bi.bi-folder-plus.me-1
+                  | Crear Carpeta
 
-    h2(style="font-size: 1.3em; color: #2c3e50; margin-bottom: 15px;") Mis Carpetas
-    if collections && collections.length > 0
-      .collections-grid(style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;")
-        each col in collections
-          .collection-card(style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;")
-            div
-              h3(style="margin: 0 0 8px 0; font-size: 1.15em; color: #2c3e50; word-wrap: break-word;") #{col.nombre_collection}
-              span(style="font-size: 0.8em; color: #7f8c8d; display: block; margin-bottom: 15px;") Creada el #{new Date(col.fecha_creacion).toLocaleDateString()}
-            .collection-actions(style="display: flex; justify-content: space-between; align-items: center;")
-              a(href=`/collections/${col.id_collection}` style="color: #2980b9; text-decoration: none; font-weight: bold; font-size: 0.9em;") Ver contenido &rarr;
-              form(action=`/collections/${col.id_collection}/delete` method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta colección? Se quitará la carpeta pero no se borrarán las publicaciones originales.')" style="margin: 0;")
-                button(type="submit" style="background: none; border: none; color: #c0392b; cursor: pointer; font-size: 0.9em; font-weight: bold; padding: 0;") Eliminar
-    else
-      p(style="color: #7f8c8d; font-style: italic; text-align: center; margin-top: 40px;") No tienes ninguna colección creada aún. ¡Crea una arriba para comenzar a guardar fotos!
+      h4.fw-bold.mb-3.mt-4 Mis Carpetas
+      if collections && collections.length > 0
+        div.row.row-cols-1.row-cols-md-2.row-cols-lg-3.g-4
+          each col in collections
+            div.col
+              div.card.h-100.shadow-sm.border-0
+                div.card-body.d-flex.flex-column.justify-content-between.p-3
+                  div
+                    h5.card-title.fw-bold.mb-1.text-dark= col.nombre_collection
+                    p.text-muted.small.mb-3 Creada el #{new Date(col.fecha_creacion).toLocaleDateString()}
+                  div.d-flex.justify-content-between.align-items-center.mt-3.pt-2.border-top
+                    a.btn.btn-link.btn-sm.text-decoration-none.fw-bold.p-0(href=`/collections/${col.id_collection}`)
+                      | Ver contenido &rarr;
+                    form(action=`/collections/${col.id_collection}/delete` method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta colección? Se quitará la carpeta pero no se borrarán las publicaciones originales.')" class="m-0")
+                      button.btn.btn-link.btn-sm.text-danger.text-decoration-none.fw-bold.p-0(type="submit")
+                        | Eliminar
+      else
+        div.text-center.py-5.bg-white.rounded.shadow-sm
+          i.bi.bi-folder-x.fs-1.text-muted
+          p.text-muted.mt-2.small No tienes ninguna colección creada aún. ¡Crea una arriba para comenzar a guardar fotos!
