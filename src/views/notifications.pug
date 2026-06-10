@@ -1,56 +1,63 @@
 extends layout
 
 block content
-  h1 Notificaciones
-  
-  .notifications-container(style="max-width: 650px; margin: 20px auto;")
-    if notifications && notifications.length > 0
-      - const unreadCount = notifications.filter(n => !n.leida).length
-      
-      if unreadCount > 0
-        div(style="display: flex; justify-content: flex-end; margin-bottom: 15px;")
-          form(action="/notifications/read-all" method="POST" style="margin: 0;")
-            button(type="submit" style="background-color: #34495e; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.85em; transition: background-color 0.2s;") Marcar todas como leídas
+  div.row
+    div.col-md-8.col-lg-6.mx-auto
+      div.d-flex.justify-content-between.align-items-center.mb-4.flex-wrap.gap-2
+        h2.fw-bold.mb-0
+          i.bi.bi-bell.me-2.text-primary
+          | Notificaciones
+        
+        if notifications && notifications.length > 0
+          - const unreadCount = notifications.filter(n => !n.leida).length
+          if unreadCount > 0
+            form(action="/notifications/read-all" method="POST" class="m-0")
+              button.btn.btn-outline-secondary.btn-sm.fw-bold(type="submit")
+                i.bi.bi-check2-all.me-1
+                | Marcar todas como leídas
 
-      ul.notifications-list(style="list-style: none; padding: 0; margin: 0;")
-        each n in notifications
-          li(class=`notification-item ${n.leida ? 'read' : 'unread'}` style=`background-color: white; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; border-left: ${n.leida ? '1px solid #ddd' : '4px solid #3498db'};`)
-            .notif-body
-              if n.tipo_evento === 'nuevo_seguidor'
-                p(style="margin: 0 0 8px 0;") El usuario 
-                  strong @#{n.username}
-                  |  comenzó a seguirte.
-              else if n.tipo_evento === 'comentario'
-                p(style="margin: 0 0 8px 0;") El usuario 
-                  strong @#{n.username}
-                  |  comentó en tu publicación.
-                if n.id_publicacion
-                  a(href=`/posts-detail/${n.id_publicacion}` class="btn-notif-link") Ver post
-              else if n.tipo_evento === 'valoracion'
-                p(style="margin: 0 0 8px 0;") El usuario 
-                  strong @#{n.username}
-                  |  valoró la imagen de tu publicación.
-                if n.id_publicacion
-                  a(href=`/posts-detail/${n.id_publicacion}` class="btn-notif-link") Ver post
-              else if n.tipo_evento === 'me_interesa'
-                p(style="margin: 0 0 8px 0;") El usuario 
-                  strong @#{n.username}
-                  |  está interesado en tu publicación.
-                if n.id_publicacion
-                  a(href=`/posts-detail/${n.id_publicacion}` class="btn-notif-link") Ver post
-              else if n.tipo_evento === 'guardada'
-                p(style="margin: 0 0 8px 0;") El usuario 
-                  strong @#{n.username}
-                  |  guardó tu publicación en su colección.
-                if n.id_publicacion
-                  a(href=`/posts-detail/${n.id_publicacion}` class="btn-notif-link") Ver post
-            
-            div(style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;")
-              span.notif-date(style="font-size: 0.8em; color: #7f8c8d; white-space: nowrap;") #{new Date(n.fecha_notificacion).toLocaleDateString()}
+      if notifications && notifications.length > 0
+        div.list-group.shadow-sm.border-0.mb-4
+          each n in notifications
+            div.list-group-item.d-flex.justify-content-between.align-items-center.p-3(
+              class=n.leida ? "bg-white border-start border-light border-4" : "bg-white border-start border-primary border-4"
+            )
+              div.d-flex.flex-column.gap-1
+                div.small.text-dark
+                  if n.tipo_evento === 'nuevo_seguidor'
+                    span El usuario 
+                      strong @#{n.username}
+                      |  comenzó a seguirte.
+                  else if n.tipo_evento === 'comentario'
+                    span El usuario 
+                      strong @#{n.username}
+                      |  comentó en tu publicación.
+                  else if n.tipo_evento === 'valoracion'
+                    span El usuario 
+                      strong @#{n.username}
+                      |  valoró la imagen de tu publicación.
+                  else if n.tipo_evento === 'me_interesa'
+                    span El usuario 
+                      strong @#{n.username}
+                      |  está interesado en tu publicación.
+                  else if n.tipo_evento === 'guardada'
+                    span El usuario 
+                      strong @#{n.username}
+                      |  guardó tu publicación en su colección.
+                
+                div.d-flex.align-items-center.gap-2.mt-1
+                  span.text-muted.small(style="font-size: 0.8em;")
+                    i.bi.bi-clock.me-1
+                    | #{new Date(n.fecha_notificacion).toLocaleDateString()}
+                  if n.id_publicacion
+                    a.btn.btn-link.btn-sm.p-0.text-decoration-none.fw-bold(href=`/posts-detail/${n.id_publicacion}` style="font-size: 0.8em;") Ver post
+              
               if !n.leida
-                form(action=`/notifications/${n.id_notificacion}/read` method="POST" style="margin: 0;")
-                  button(type="submit" style="background-color: #3498db; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 0.75em; font-weight: bold; cursor: pointer; transition: background-color 0.2s;") Marcar leída
-    else
-      .no-notifications(style="text-align: center; padding: 40px; border: 1px dashed #ccc; border-radius: 8px; background-color: #fafafa;")
-        p(style="font-size: 1.1em; color: #7f8c8d; margin: 0 0 15px 0;") No tienes notificaciones por el momento.
-        a(href="/" class="btn-detail" style="text-decoration: none;") Volver al inicio
+                form(action=`/notifications/${n.id_notificacion}/read` method="POST" class="m-0")
+                  button.btn.btn-primary.btn-sm.fw-bold(type="submit" style="font-size: 0.75em;")
+                    | Marcar leída
+      else
+        div.text-center.py-5.bg-white.rounded.shadow-sm.p-4
+          i.bi.bi-bell-slash.fs-1.text-muted
+          p.text-muted.mt-2.small No tienes notificaciones por el momento.
+          a.btn.btn-primary.btn-sm.fw-bold.mt-3(href="/") Volver al inicio
