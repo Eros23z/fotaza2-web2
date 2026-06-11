@@ -7,21 +7,54 @@ const applyWatermark = async (input, originalname, watermarkText) => {
     const nuevoNombre = `${name}-watermark${ext}`;
 
     const watermark = watermarkText || "Fotaza 2 - 2026 © Todos los derechos reservados";
-    const svgTexto = `
-    <svg width="600" height="80">
-      <style>
-        .titulo { fill: white; font-size: 20px; font-family: sans-serif; font-weight: bold; opacity: 0.5; }
-      </style>
-      <text x="15" y="45" class="titulo">${watermark}</text>
-    </svg>
-  `;
 
     try {
-        const bufferConMarcaAgua = await sharp(input)
+        const image = sharp(input);
+        const metadata = await image.metadata();
+        const imgWidth = metadata.width || 800;
+        const imgHeight = metadata.height || 600;
+
+        // Calcular tamaño de fuente proporcional al ancho de la imagen (2.5% del ancho)
+        // Con un mínimo de 16px para imágenes muy pequeñas
+        const fontSize = Math.max(16, Math.round(imgWidth * 0.025));
+        
+        // Coordenadas proporcionales (3% de margen desde los bordes inferior y derecho)
+        const xPos = imgWidth - Math.round(imgWidth * 0.03);
+        const yPos = imgHeight - Math.round(imgHeight * 0.03);
+        
+        // Desplazamiento para la sombra
+        const shadowOffset = Math.max(1, Math.round(fontSize * 0.05));
+
+        const svgTexto = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${imgWidth}" height="${imgHeight}">
+          <style>
+            .titulo {
+              fill: white;
+              font-size: ${fontSize}px;
+              font-family: 'DejaVu Sans', 'Liberation Sans', 'Arial', sans-serif;
+              font-weight: bold;
+              opacity: 0.75;
+            }
+            .titulo-shadow {
+              fill: black;
+              font-size: ${fontSize}px;
+              font-family: 'DejaVu Sans', 'Liberation Sans', 'Arial', sans-serif;
+              font-weight: bold;
+              opacity: 0.6;
+            }
+          </style>
+          <!-- Sombra para garantizar legibilidad en fondos claros -->
+          <text x="${xPos + shadowOffset}" y="${yPos + shadowOffset}" text-anchor="end" class="titulo-shadow">${watermark}</text>
+          <text x="${xPos}" y="${yPos}" text-anchor="end" class="titulo">${watermark}</text>
+        </svg>
+        `;
+
+        const bufferConMarcaAgua = await image
             .composite([
                 {
-                    input: Buffer.from(svgTexto),
-                    gravity: 'southeast'
+                    input: Buffer.from(svgTexto, 'utf-8'),
+                    top: 0,
+                    left: 0
                 }
             ])
             .toBuffer();

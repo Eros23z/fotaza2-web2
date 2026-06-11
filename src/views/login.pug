@@ -3,28 +3,28 @@ extends layout
 block content
   div.row
     div.col-md-6.col-lg-5.mx-auto
-      div.card.shadow-sm.border-0.mt-4
-        div.card-body.p-4
-          h2.card-title.text-center.mb-4.fw-bold Iniciar Sesión
+      div.card.border-0.mt-5
+        div.card-body.p-5
+          h2.text-center.mb-4.fw-bold(style="color: var(--text-primary);") Iniciar Sesión
           
           if error
             div.alert.alert-danger.text-center.py-2.small #{error}
 
           form(action="/login" method="POST")
             div.mb-3
-              label.form-label.small.fw-bold(for="username") Nombre de usuario:
-              input.form-control(type="text" name="username" id="username" required)
+              label(for="username") Nombre de usuario
+              input.form-control(type="text" name="username" id="username" required placeholder="ej. usuario123")
             
             div.mb-3
-              label.form-label.small.fw-bold(for="email") Correo Electrónico:
-              input.form-control(type="email" name="email" id="email" required)
+              label(for="email") Correo Electrónico
+              input.form-control(type="email" name="email" id="email" required placeholder="ejemplo@correo.com")
             
-            div.mb-3
-              label.form-label.small.fw-bold(for="password") Contraseña:
-              input.form-control(type="password" name="password" id="password" required)
+            div.mb-4
+              label(for="password") Contraseña
+              input.form-control(type="password" name="password" id="password" required placeholder="••••••••")
 
             button.btn.btn-primary.w-100.mt-3.fw-bold(type="submit") Entrar
           
           div.text-center.mt-4.small
-            span ¿No tienes una cuenta? 
-            a.text-decoration-none(href="/register") Regístrate aquí
+            span.text-muted ¿No tienes una cuenta? 
+            a.text-primary.fw-bold.text-decoration-none(href="/register") Regístrate aquí

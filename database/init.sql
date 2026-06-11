@@ -147,7 +147,7 @@ CREATE TABLE mensajes (
 );
 
 
-
+-- Usuarios de ejemplo
 INSERT INTO usuarios (nombre, apellido, username, email, password, fecha_nacimiento, rol, estado) 
 VALUES 
 ('Admin', 'Validador', 'admin_validador', 'admin@fotaza.com', '$2b$10$EokGvk4qSyPSH.3C72swvuO58CSwJ6d2wVY0FujmwdeDEnsBg2Af.', '1990-01-01', 'validador', 'activo'),
@@ -165,8 +165,7 @@ VALUES
 (4, 'Retrato Minimalista', 'Estudio de luces y sombras en retrato blanco y negro.', FALSE, FALSE),
 (3, 'Publicacion Indecente', 'Este post va a ser denunciado y dado de baja para pruebas de baneo.', FALSE, FALSE);
 
--- Imágenes asociadas a publicaciones
--- Nota: Usamos URLs ficticias / de ejemplo que apunten a imágenes públicas de Unsplash para pruebas visuales bonitas
+-- Imagenes de ejemplo
 INSERT INTO imagenes (id_publicacion, imagen_url, tiene_copyright, marca_agua)
 VALUES
 (1, 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800', FALSE, FALSE),
@@ -175,7 +174,7 @@ VALUES
 (4, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800', TRUE, FALSE),
 (5, 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=800', FALSE, FALSE);
 
--- Etiquetas
+-- Etiquetas de ejemplo
 INSERT INTO etiquetas (nombre_tag)
 VALUES
 ('paisajes'),
@@ -184,7 +183,7 @@ VALUES
 ('retrato'),
 ('test');
 
--- Relación Publicación - Etiqueta
+-- Relacion Publicacion - Etiqueta
 INSERT INTO publicacion_etiqueta (id_publicacion, id_tag)
 VALUES
 (1, 1),
@@ -194,7 +193,7 @@ VALUES
 (4, 4),
 (5, 5);
 
--- Comentarios
+-- Comentarios de ejemplo
 INSERT INTO comentarios (id_usuario, id_publicacion, texto_comentario, filtrado)
 VALUES
 (3, 1, '¡Qué foto tan increíble! Me encanta la iluminación.', FALSE),
@@ -203,40 +202,40 @@ VALUES
 (3, 4, 'Me gusta el contraste del blanco y negro.', FALSE),
 (4, 3, 'Este comentario es ofensivo y será denunciado', FALSE);
 
--- Valoraciones (Ratings)
+-- Valoraciones de eejemplo
 INSERT INTO valoraciones_imagen (id_usuario, id_imagen, puntaje)
 VALUES
 (3, 1, 5),
-(4, 1, 5), -- Atardecer tiene promedio 5.0 (2 votos) - Altamente valorada
+(4, 1, 5),
 (3, 2, 4),
-(4, 2, 5), -- Luces de la ciudad tiene promedio 4.5 (2 votos) - Altamente valorada
-(2, 3, 3), -- Bosque de Pinos tiene promedio 3.0 (1 voto)
-(2, 4, 4); -- Retrato tiene promedio 4.0 (1 voto)
+(4, 2, 5),
+(2, 3, 3),
+(2, 4, 4);
 
--- Seguidores
+-- Seguidores de ejemplo
 INSERT INTO seguidores (id_seguidor, id_seguido)
 VALUES
-(2, 3), -- Eros sigue a Juan
-(2, 4), -- Eros sigue a Maria
-(3, 2), -- Juan sigue a Eros
-(4, 2); -- Maria sigue a Eros
+(2, 3),
+(2, 4),
+(3, 2),
+(4, 2);
 
--- Mensajes privados
+-- Mensajes de ejemplo
 INSERT INTO mensajes (id_usuario_envia, id_usuario_recibe, texto_mensaje, fecha_mensaje)
 VALUES
 (3, 2, 'Hola Eros, me interesa comprar tu foto de atardecer.', NOW() - INTERVAL '1 hour'),
 (2, 3, 'Hola Juan! Claro, charlemos sobre los detalles de la licencia.', NOW() - INTERVAL '45 minutes'),
 (3, 2, 'Genial, ¿aceptás transferencia?', NOW() - INTERVAL '30 minutes');
 
--- Colecciones
+-- Colecciones de ejemplo
 INSERT INTO colecciones (id_usuario, nombre_coleccion)
 VALUES
-(2, 'Favoritos'), -- Colección privada por defecto de Eros
+(2, 'Favoritos'),
 (2, 'Naturaleza y Paisajes'),
 (3, 'Favoritos'),
 (3, 'Inspiración urbana');
 
--- Agregar publicaciones a colecciones
+-- Agregado de publicaciones a una coleccion
 INSERT INTO coleccion_publicacion (id_coleccion, id_publicacion)
 VALUES
 (1, 1),
@@ -244,13 +243,13 @@ VALUES
 (2, 3),
 (4, 2);
 
--- Denuncias
+-- Denuncias de ejemplo
 INSERT INTO denuncias (id_usuario_denunciante, id_publicacion, id_comentario, motivo, descripcion, estado)
 VALUES
 (3, 2, NULL, 'Copyright', 'Creo que esta foto no es del autor original, reclamo derechos.', 'Pendiente'),
 (2, NULL, 5, 'Contenido inapropiado', 'El comentario de Maria es ofensivo.', 'Pendiente');
 
--- Notificaciones
+-- Notificaciones de ejemplo
 INSERT INTO notificaciones (id_usuario_destino, id_usuario_origen, id_publicacion, tipo_evento, leida)
 VALUES
 (2, 3, 1, 'comentario', FALSE),

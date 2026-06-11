@@ -3,9 +3,9 @@ extends layout
 block content
   div.row
     div.col-md-8.col-lg-6.mx-auto
-      div.card.shadow-sm.border-0.mt-4
-        div.card-body.p-4
-          h2.card-title.text-center.mb-4.fw-bold Crear Cuenta
+      div.card.border-0.mt-5
+        div.card-body.p-5
+          h2.text-center.mb-4.fw-bold(style="color: var(--text-primary);") Crear Cuenta
           
           if error
             div.alert.alert-danger.text-center.py-2.small #{error}
@@ -13,30 +13,30 @@ block content
           form(action="/register" method="POST")
             div.row.g-3.mb-3
               div.col-sm-6
-                label.form-label.small.fw-bold(for="nombre") Nombre:
-                input.form-control(type="text" name="nombre" id="nombre" required)
+                label(for="nombre") Nombre
+                input.form-control(type="text" name="nombre" id="nombre" required placeholder="Tu nombre")
               div.col-sm-6
-                label.form-label.small.fw-bold(for="apellido") Apellido:
-                input.form-control(type="text" name="apellido" id="apellido" required)
+                label(for="apellido") Apellido
+                input.form-control(type="text" name="apellido" id="apellido" required placeholder="Tu apellido")
             
             div.mb-3
-              label.form-label.small.fw-bold(for="username") Nombre de usuario:
-              input.form-control(type="text" name="username" id="username" required)
+              label(for="username") Nombre de usuario
+              input.form-control(type="text" name="username" id="username" required placeholder="ej. usuario123")
             
             div.mb-3
-              label.form-label.small.fw-bold(for="email") Correo Electrónico:
-              input.form-control(type="email" name="email" id="email" required)
+              label(for="email") Correo Electrónico
+              input.form-control(type="email" name="email" id="email" required placeholder="ejemplo@correo.com")
             
             div.mb-3
-              label.form-label.small.fw-bold(for="password") Contraseña:
-              input.form-control(type="password" name="password" id="password" required)
+              label(for="password") Contraseña
+              input.form-control(type="password" name="password" id="password" required placeholder="••••••••")
             
-            div.mb-3
-              label.form-label.small.fw-bold(for="fecha_nacimiento") Fecha de nacimiento:
+            div.mb-4
+              label(for="fecha_nacimiento") Fecha de nacimiento
               input.form-control(type="date" name="fecha_nacimiento" id="fecha_nacimiento" required)
 
             button.btn.btn-primary.w-100.mt-3.fw-bold(type="submit") Registrarse
           
           div.text-center.mt-4.small
-            span ¿Ya tienes una cuenta? 
-            a.text-decoration-none(href="/login") Inicia sesión aquí
+            span.text-muted ¿Ya tienes una cuenta? 
+            a.text-primary.fw-bold.text-decoration-none(href="/login") Inicia sesión aquí

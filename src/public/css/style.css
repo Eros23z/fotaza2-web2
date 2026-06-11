@@ -626,3 +626,8 @@ footer {
 .btn-notif-link:hover {
     background-color: #2980b9;
 }
+
+/* Prevenir saltos de línea en los enlaces del menú de navegación */
+.navbar-nav .nav-link {
+    white-space: nowrap !important;
+}

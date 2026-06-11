@@ -3,7 +3,7 @@ const db = require('../config/db');
 const Report = {
     reportPost: async (id_denunciante, id_publicacion, motivo, descripcion) => {
         const query = `
-            INSERT INTO denuncias (id_denunciante, id_publicacion, motivo, descripcion)
+            INSERT INTO denuncias (id_usuario_denunciante, id_publicacion, motivo, descripcion)
             VALUES ($1, $2, $3, $4)
         `;
         await db.query(query, [id_denunciante, id_publicacion, motivo, descripcion]);
@@ -17,7 +17,7 @@ const Report = {
 
     reportComment: async (id_denunciante, id_comentario, motivo, descripcion) => {
         const query = `
-            INSERT INTO denuncias (id_denunciante, id_comentario, motivo, descripcion)
+            INSERT INTO denuncias (id_usuario_denunciante, id_comentario, motivo, descripcion)
             VALUES ($1, $2, $3, $4)
         `;
         await db.query(query, [id_denunciante, id_comentario, motivo, descripcion]);
@@ -43,7 +43,7 @@ const Report = {
                    p.titulo as titulo_publicacion,
                    c.texto_comentario as texto_comentario
             FROM denuncias d
-            JOIN usuarios u ON d.id_denunciante = u.id_usuario
+            JOIN usuarios u ON d.id_usuario_denunciante = u.id_usuario
             LEFT JOIN publicaciones p ON d.id_publicacion = p.id_publicacion
             LEFT JOIN comentarios c ON d.id_comentario = c.id_comentario
             WHERE d.estado = 'Pendiente'
@@ -85,7 +85,7 @@ const Report = {
             SELECT d.*, u.username as username_denunciante,
                    c.texto_comentario, c.id_publicacion, p.titulo as titulo_publicacion
             FROM denuncias d
-            JOIN usuarios u ON d.id_denunciante = u.id_usuario
+            JOIN usuarios u ON d.id_usuario_denunciante = u.id_usuario
             JOIN comentarios c ON d.id_comentario = c.id_comentario
             JOIN publicaciones p ON c.id_publicacion = p.id_publicacion
             WHERE p.id_usuario = $1 AND d.estado = 'Pendiente'
