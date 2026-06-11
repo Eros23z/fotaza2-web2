@@ -31,13 +31,16 @@ Cree un archivo llamado `.env` en la raíz del proyecto (puede guiarse del archi
 
 ```env
 PORT=3000
-DB_HOST=localhost
 DB_PORT=5432
-DB_USER=su_usuario_de_postgres
-DB_PASSWORD=su_contraseña_de_postgres
-DB_NAME=nombre_de_su_base_de_datos
-JWT_SECRET=un_secreto_para_firmar_jwt
+DB_HOST=localhost
+DB_USER=postgres
+DB_PASSWORD=contraseña
+DB_NAME=fotaza_db
+JWT_SECRET=f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8
 STORAGE_TYPE=local
+SUPABASE_URL=https://ddaxeynqsdkkrbepwkdh.supabase.co
+SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkYXhleW5xc2Rra3JiZXB3a2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2OTE5MjUsImV4cCI6MjA5NjI2NzkyNX0.iP55OlVs6PiK7UpCOLcB8WNZkHyhPvszTyqTa2Rvo24
+SUPABASE_BUCKET=imagenes-fotaza
 ```
 
 ### 4. Inicializar la base de datos
