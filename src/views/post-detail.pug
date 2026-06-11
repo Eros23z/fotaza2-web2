@@ -13,11 +13,17 @@ block content
                   span Subido por: 
                   a.fw-bold.text-decoration-none(href=`/profile/${post.id_usuario}`) @#{post.username}
               
-              if user && !isAuthor
-                form(action=`/interest/${post.id_publicacion}` method="POST" class="m-0")
-                  button.btn.btn-warning.btn-sm.fw-bold(type="submit")
-                    i.bi.bi-chat-dots.me-1
-                    | Me interesa / Contactar
+              if user
+                if !isAuthor
+                  form(action=`/interest/${post.id_publicacion}` method="POST" class="m-0")
+                    button.btn.btn-warning.btn-sm.fw-bold(type="submit")
+                      i.bi.bi-chat-dots.me-1
+                      | Me interesa / Contactar
+                else
+                  form(action=`/posts-detail/${post.id_publicacion}/delete` method="POST" class="m-0" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta publicación permanentemente? Esta acción no se puede deshacer.')")
+                    button.btn.btn-danger.btn-sm.fw-bold(type="submit")
+                      i.bi.bi-trash.me-1
+                      | Eliminar publicación
             
             p.lead.fs-6= post.descripcion
 

@@ -182,3 +182,21 @@ exports.closeComments = async (req, res) => {
         res.status(500).send('Error al cerrar los comentarios');
     }
 }
+
+exports.deletePost = async (req, res) => {
+    try {
+        const { id_publicacion } = req.params;
+        const post = await Post.getPostDetail(id_publicacion);
+        if (!post) {
+            return res.status(404).send('Publicación no encontrada');
+        }
+        if (req.user.id !== post.id_usuario) {
+            return res.status(403).send('No estás autorizado para realizar esta acción');
+        }
+        await Post.delete(id_publicacion);
+        res.redirect(`/profile/${req.user.id}`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al eliminar la publicación');
+    }
+}

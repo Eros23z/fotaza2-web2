@@ -75,6 +75,7 @@ app.get('/posts-detail/:id_publicacion', postController.getPostDetail);
 app.post('/posts-detail/:id_publicacion/comments', protect, commentController.addComments);
 app.post('/posts-detail/:id_publicacion/rate', protect, rateController.addRating);
 app.post('/posts-detail/:id_publicacion/close-comments', protect, postController.closeComments);
+app.post('/posts-detail/:id_publicacion/delete', protect, postController.deletePost);
 
 app.get('/following', protect, async (req, res) => {
     try {

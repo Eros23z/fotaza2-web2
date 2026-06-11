@@ -140,6 +140,11 @@ const Post = {
         `;
         const { rows } = await db.query(query, [id_usuario]);
         return rows;
+    },
+
+    delete: async (id_publicacion) => {
+        const query = `DELETE FROM publicaciones WHERE id_publicacion = $1`;
+        await db.query(query, [id_publicacion]);
     }
 };
 
