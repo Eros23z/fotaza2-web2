@@ -41,14 +41,14 @@ const applyWatermark = async (input, originalname, watermarkText) => {
             .titulo {
               fill: white;
               font-size: ${fontSize}px;
-              font-family: Arial, sans-serif;
+              font-family: DejaVu Sans, Liberation Sans, Arial, sans-serif;
               font-weight: bold;
               opacity: 0.75;
             }
             .titulo-shadow {
               fill: black;
               font-size: ${fontSize}px;
-              font-family: Arial, sans-serif;
+              font-family: DejaVu Sans, Liberation Sans, Arial, sans-serif;
               font-weight: bold;
               opacity: 0.6;
             }
