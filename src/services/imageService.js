@@ -2,11 +2,21 @@ const sharp = require('sharp');
 const fs = require('fs/promises');
 const path = require('path');
 
+const escapeXml = (unsafe) => {
+    return (unsafe || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+};
+
 const applyWatermark = async (input, originalname, watermarkText) => {
     const { name, ext } = path.parse(originalname);
     const nuevoNombre = `${name}-watermark${ext}`;
 
-    const watermark = watermarkText || "Fotaza 2 - 2026 © Todos los derechos reservados";
+    const watermark = watermarkText ? watermarkText.trim() : "";
+    const escapedWatermark = escapeXml(watermark);
 
     try {
         const image = sharp(input);
@@ -31,21 +41,21 @@ const applyWatermark = async (input, originalname, watermarkText) => {
             .titulo {
               fill: white;
               font-size: ${fontSize}px;
-              font-family: 'DejaVu Sans', 'Liberation Sans', 'Arial', sans-serif;
+              font-family: Arial, sans-serif;
               font-weight: bold;
               opacity: 0.75;
             }
             .titulo-shadow {
               fill: black;
               font-size: ${fontSize}px;
-              font-family: 'DejaVu Sans', 'Liberation Sans', 'Arial', sans-serif;
+              font-family: Arial, sans-serif;
               font-weight: bold;
               opacity: 0.6;
             }
           </style>
           <!-- Sombra para garantizar legibilidad en fondos claros -->
-          <text x="${xPos + shadowOffset}" y="${yPos + shadowOffset}" text-anchor="end" class="titulo-shadow">${watermark}</text>
-          <text x="${xPos}" y="${yPos}" text-anchor="end" class="titulo">${watermark}</text>
+          <text x="${xPos + shadowOffset}" y="${yPos + shadowOffset}" text-anchor="end" class="titulo-shadow">${escapedWatermark}</text>
+          <text x="${xPos}" y="${yPos}" text-anchor="end" class="titulo">${escapedWatermark}</text>
         </svg>
         `;
 
