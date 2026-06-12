@@ -1,75 +1,51 @@
 const sharp = require('sharp');
-const fs = require('fs/promises');
+const Jimp = require('jimp');
 const path = require('path');
-
-const escapeXml = (unsafe) => {
-    return (unsafe || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&apos;');
-};
 
 const applyWatermark = async (input, originalname, watermarkText) => {
     const { name, ext } = path.parse(originalname);
     const nuevoNombre = `${name}-watermark${ext}`;
 
     const watermark = watermarkText ? watermarkText.trim() : "";
-    const escapedWatermark = escapeXml(watermark);
 
     try {
-        const image = sharp(input);
-        const metadata = await image.metadata();
-        const imgWidth = metadata.width || 800;
-        const imgHeight = metadata.height || 600;
+        // Convertir el buffer de entrada a PNG 
+        const pngBuffer = await sharp(input).png().toBuffer();
+        const image = await Jimp.read(pngBuffer);
+        const imgWidth = image.getWidth();
+        const imgHeight = image.getHeight();
 
-        // Calcular tamaño de fuente proporcional al ancho de la imagen (2.5% del ancho)
-        const fontSize = Math.max(16, Math.round(imgWidth * 0.025));
-        
-        // Coordenadas proporcionales (3% de margen desde los bordes inferior y derecho)
-        const xPos = imgWidth - Math.round(imgWidth * 0.03);
-        const yPos = imgHeight - Math.round(imgHeight * 0.03);
-        
-        // Desplazamiento para la sombra
-        const shadowOffset = Math.max(1, Math.round(fontSize * 0.05));
+        // Elegir fuente segun el ancho de la imagen 
+        let fontBlack, fontWhite;
+        if (imgWidth >= 1000) {
+            fontBlack = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK);
+            fontWhite = await Jimp.loadFont(Jimp.FONT_SANS_64_WHITE);
+        } else if (imgWidth >= 500) {
+            fontBlack = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK);
+            fontWhite = await Jimp.loadFont(Jimp.FONT_SANS_32_WHITE);
+        } else {
+            fontBlack = await Jimp.loadFont(Jimp.FONT_SANS_16_BLACK);
+            fontWhite = await Jimp.loadFont(Jimp.FONT_SANS_16_WHITE);
+        }
 
-        const svgTexto = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${imgWidth}" height="${imgHeight}">
-          <style>
-            .titulo {
-              fill: white;
-              font-size: ${fontSize}px;
-              font-family: DejaVu Sans, Liberation Sans, Arial, sans-serif;
-              font-weight: bold;
-              opacity: 0.75;
-            }
-            .titulo-shadow {
-              fill: black;
-              font-size: ${fontSize}px;
-              font-family: DejaVu Sans, Liberation Sans, Arial, sans-serif;
-              font-weight: bold;
-              opacity: 0.6;
-            }
-          </style>
-          <!-- Sombra para garantizar legibilidad en fondos claros -->
-          <text x="${xPos + shadowOffset}" y="${yPos + shadowOffset}" text-anchor="end" class="titulo-shadow">${escapedWatermark}</text>
-          <text x="${xPos}" y="${yPos}" text-anchor="end" class="titulo">${escapedWatermark}</text>
-        </svg>
-        `;
+        // Calcular posición inferior derecha con margen del 3%
+        const margen = Math.round(imgWidth * 0.03);
+        const textWidth = Jimp.measureText(fontWhite, watermark);
+        const textHeight = Jimp.measureTextHeight(fontWhite, watermark, textWidth);
+        const x = imgWidth - textWidth - margen;
+        const y = imgHeight - textHeight - margen;
 
-        const bufferConMarcaAgua = await image
-            .composite([
-                {
-                    input: Buffer.from(svgTexto, 'utf-8'),
-                    top: 0,
-                    left: 0
-                }
-            ])
+        // Aplicar sombra y luego el texto blanco encima
+        image.print(fontBlack, x + 1, y + 1, watermark);
+        image.print(fontWhite, x, y, watermark);
+
+        // Exportar de vuelta al formato original usando sharp
+        const finalBuffer = await sharp(await image.getBufferAsync(Jimp.MIME_PNG))
+            .toFormat(ext.replace('.', '') === 'jpg' ? 'jpeg' : ext.replace('.', ''))
             .toBuffer();
-        
+
         return {
-            buffer: bufferConMarcaAgua,
+            buffer: finalBuffer,
             filename: nuevoNombre
         };
     } catch (error) {
@@ -79,4 +55,3 @@ const applyWatermark = async (input, originalname, watermarkText) => {
 }
 
 module.exports = applyWatermark;
-
