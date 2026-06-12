@@ -6,7 +6,7 @@
       "use": "@vercel/node",
       "config": {
         "includeFiles": [
-          "node_modules/jimp/fonts/**"
+          "node_modules/@jimp/plugin-print/fonts/**"
         ]
       }
     }
