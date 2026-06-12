@@ -25,7 +25,6 @@ const applyWatermark = async (input, originalname, watermarkText) => {
         const imgHeight = metadata.height || 600;
 
         // Calcular tamaño de fuente proporcional al ancho de la imagen (2.5% del ancho)
-        // Con un mínimo de 16px para imágenes muy pequeñas
         const fontSize = Math.max(16, Math.round(imgWidth * 0.025));
         
         // Coordenadas proporcionales (3% de margen desde los bordes inferior y derecho)
